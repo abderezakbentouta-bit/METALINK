@@ -429,13 +429,43 @@
     }
     announcements = data || [];
     renderDashboard();
+    renderFilteredListings();
+  }
+
+  let activeListingFilter = 'all';
+  function renderFilteredListings() {
+    const container = $('logisticsListings');
+    const query = ($('listingSearch')?.value || '').trim().toLocaleLowerCase();
     container.innerHTML = '';
     if (!announcements.length) {
       container.innerHTML = '<p class="empty-state">لا توجد عروض بعد. كن أول من ينشر شاحنة أو طلب نقل.</p>';
       return;
     }
-    announcements.forEach((row) => container.appendChild(renderListing(row)));
+    const filtered = announcements.filter((row) => {
+      if (activeListingFilter !== 'all' && row.type_annonce !== activeListingFilter) return false;
+      const searchable = [row.ville_depart, row.ville_arrivee, row.type_camion, row.marchandise, row.informations, row.telephone]
+        .filter(Boolean).join(' ').toLocaleLowerCase();
+      return !query || searchable.includes(query);
+    });
+    if (!filtered.length) {
+      container.innerHTML = '<p class="empty-state">لا توجد نتائج مطابقة. جرّب مدينة أخرى أو اختر «الكل».</p>';
+      return;
+    }
+    filtered.forEach((row) => container.appendChild(renderListing(row)));
   }
+
+  $('listingSearch').addEventListener('input', renderFilteredListings);
+  document.querySelectorAll('[data-listing-filter]').forEach((button) => {
+    button.addEventListener('click', () => {
+      activeListingFilter = button.dataset.listingFilter;
+      document.querySelectorAll('[data-listing-filter]').forEach((other) => {
+        const active = other === button;
+        other.classList.toggle('active', active);
+        other.setAttribute('aria-pressed', String(active));
+      });
+      renderFilteredListings();
+    });
+  });
   $('refreshListings').addEventListener('click', loadListings);
 
   async function publishTransport(form, type) {
