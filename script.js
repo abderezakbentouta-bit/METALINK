@@ -63,6 +63,103 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
   }
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
+  const authForm = document.getElementById('authForm');
+  const authEmail = document.getElementById('authEmail');
+  const authPassword = document.getElementById('authPassword');
+  const authStatus = document.getElementById('authStatus');
+  const authSubmit = document.getElementById('authSubmit');
+  const signInMode = document.getElementById('signInMode');
+  const signUpMode = document.getElementById('signUpMode');
+  const resetPassword = document.getElementById('resetPassword');
+  const signOutButton = document.getElementById('signOutButton');
+  let authMode = 'signin';
+  let currentUser = null;
+  function showAuthMessage(message, isError = false) {
+    if (!authStatus) return;
+    authStatus.textContent = message;
+    authStatus.classList.toggle('error', isError);
+  }
+  function setAuthMode(mode) {
+    authMode = mode;
+    signInMode?.classList.toggle('active', mode === 'signin');
+    signUpMode?.classList.toggle('active', mode === 'signup');
+    if (authSubmit) authSubmit.textContent = mode === 'signup' ? 'Créer mon compte →' : 'Se connecter →';
+    if (authPassword) authPassword.autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+    showAuthMessage(mode === 'signup' ? 'Créez un compte avec votre adresse e-mail.' : 'Saisissez votre adresse e-mail et votre mot de passe.');
+  }
+  signInMode?.addEventListener('click', () => setAuthMode('signin'));
+  signUpMode?.addEventListener('click', () => setAuthMode('signup'));
+  function updateAuthUI(user) {
+    currentUser = user || null;
+    if (currentUser) {
+      showAuthMessage('Connecté : ' + (currentUser.email || 'compte MetaLink') + '. Vous pouvez publier vos annonces.');
+      if (signOutButton) signOutButton.hidden = false;
+      if (authSubmit) authSubmit.hidden = true;
+      if (authEmail) authEmail.value = currentUser.email || '';
+      if (authPassword) authPassword.value = '';
+    } else {
+      showAuthMessage('Vous n’êtes pas connecté. Connectez-vous pour publier une annonce.');
+      if (signOutButton) signOutButton.hidden = true;
+      if (authSubmit) authSubmit.hidden = false;
+    }
+  }
+  authForm?.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!authEmail?.value || !authPassword?.value) return;
+    authSubmit.disabled = true;
+    authSubmit.textContent = authMode === 'signup' ? 'Création en cours…' : 'Connexion…';
+    try {
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+      if (authMode === 'signup') {
+        const { data, error } = await db.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + window.location.pathname } });
+        if (error) throw error;
+        if (data.session) updateAuthUI(data.user);
+        else showAuthMessage('Compte créé. Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.');
+      } else {
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        updateAuthUI(data.user);
+      }
+    } catch (error) {
+      showAuthMessage(error.message || 'Échec de l’authentification. Vérifiez les informations et les réglages Supabase.', true);
+    } finally {
+      authSubmit.disabled = false;
+      if (!currentUser) authSubmit.textContent = authMode === 'signup' ? 'Créer mon compte →' : 'Se connecter →';
+    }
+  });
+  resetPassword?.addEventListener('click', async () => {
+    const email = authEmail?.value.trim();
+    if (!email) {
+      showAuthMessage('Saisissez d’abord votre adresse e-mail pour recevoir le lien de réinitialisation.', true);
+      authEmail?.focus();
+      return;
+    }
+    resetPassword.disabled = true;
+    try {
+      const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+      if (error) throw error;
+      showAuthMessage('Si cette adresse est enregistrée, un e-mail de réinitialisation va être envoyé.');
+    } catch (error) {
+      showAuthMessage(error.message || 'Impossible d’envoyer le lien de réinitialisation.', true);
+    } finally {
+      resetPassword.disabled = false;
+    }
+  });
+  signOutButton?.addEventListener('click', async () => {
+    signOutButton.disabled = true;
+    const { error } = await db.auth.signOut();
+    signOutButton.disabled = false;
+    if (error) showAuthMessage(error.message, true);
+    else updateAuthUI(null);
+  });
+  db.auth.getSession().then(({ data, error }) => {
+    if (error) showAuthMessage(error.message, true);
+    updateAuthUI(data?.session?.user || null);
+  });
+  db.auth.onAuthStateChange((_event, session) => updateAuthUI(session?.user || null));
+
+
   tabs.forEach(tab => tab.addEventListener('click', () => {
     tabs.forEach(item => {
       const active = item === tab;
@@ -127,7 +224,14 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
       infoParts.push(`${isCarrier ? 'Prix souhaité' : 'Budget indicatif'} : ${price ? `${Number(price).toLocaleString('fr-FR')} DA` : 'À négocier'}`);
       const details = isCarrier ? data.cargo : data.details;
       if (details && details.trim()) infoParts.push(details.trim());
+      if (!currentUser) {
+        status.hidden = false;
+        status.textContent = 'Connectez-vous ou créez un compte dans la section Connexion avant de publier.';
+        document.getElementById('auth')?.scrollIntoView({behavior:'smooth'});
+        return;
+      }
       const row = {
+        user_id: currentUser.id,
         type_annonce: isCarrier ? 'offre_transport' : 'demande_transport',
         ville_depart: data.origin.trim(),
         ville_arrivee: data.destination.trim(),
