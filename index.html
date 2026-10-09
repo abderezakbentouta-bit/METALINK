@@ -1,203 +1,122 @@
 <!doctype html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="MetaLink connecte les professionnels du métal : acier, profilés, tubes, tôles et construction métallique.">
-  <title>MetaLink — Le métal connecte vos projets</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102b3f">
+  <meta name="description" content="MetaLink Logistique — منصة بسيطة للحمولات والشاحنات والنقل في الجزائر.">
+  <title>MetaLink Logistique — النقل بسهولة</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="#" aria-label="MetaLink accueil"><span class="brand-mark">∞</span><span><b>Meta<span>Link</span></b><small>Le métal connecte vos projets</small></span></a>
-  <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
-  <nav id="mainNav">
-    <a class="active" href="#accueil">Accueil</a><a href="#categories">Produits</a><a href="#logistique">Logistique</a><a href="#chauffeur-chat">Discussion</a><a href="#publicite">Publicité</a><a href="#fournisseurs">Fournisseurs</a><a href="#acheteurs">Acheteurs</a><a href="#apropos">À propos</a><a href="#contact">Contact</a>
-  </nav>
-  <div class="top-actions"><a class="login" href="#auth">Connexion</a><a class="btn btn-small" href="#auth">S'inscrire</a></div>
-</header>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="MetaLink الرئيسية"><span class="brand-icon">M</span><span><strong>MetaLink</strong><small>LOGISTIQUE · الجزائر</small></span></a>
+    <div class="top-actions">
+      <span id="accountLabel" class="account-label">زائر</span>
+      <a class="account-link" href="#account" id="accountShortcut">👤 حسابي</a>
+    </div>
+  </header>
 
-<main>
-<section class="hero" id="accueil">
-  <div class="hero-shade"></div>
-  <div class="hero-content">
-    <p class="eyebrow">LA PLACE DE MARCHÉ DES PROFESSIONNELS</p>
-    <h1>Le métal connecte<br>vos <span>projets.</span></h1>
-    <p class="hero-copy">Trouvez des fournisseurs, comparez les produits métalliques et développez votre réseau professionnel.</p>
-    <form class="searchbar" id="searchForm">
-      <label class="search-field"><span>⌕</span><input id="searchInput" type="search" placeholder="IPE, HEA, tubes, tôles…" aria-label="Rechercher un produit"></label>
-      <label class="region-field">⌖ <select id="regionSelect" aria-label="Région"><option value="">Toutes les régions</option><option>Blida</option><option>Alger</option><option>Oran</option><option>Sétif</option><option>Constantine</option></select></label>
-      <button class="btn" type="submit">Rechercher <span>→</span></button>
-    </form>
-    <p class="search-hint">IPE · HEA · UPN · Tubes · Tôles · Fer rond · Bobines acier</p>
-  </div>
-</section>
+  <main id="home">
+    <section class="welcome">
+      <div class="welcome-symbol" aria-hidden="true">🚚</div>
+      <div><p class="eyebrow">النقل أسهل مع MetaLink</p><h1>ماذا تريد اليوم؟</h1><p class="welcome-copy">اختر زرًا كبيرًا للمتابعة.</p></div>
+    </section>
 
-<section class="trust-strip">
-  <div><span class="line-icon">◇</span><p><b>Produits spécialisés</b><small>Pour les métiers du métal</small></p></div>
-  <div><span class="line-icon">♧</span><p><b>Réseau professionnel</b><small>Fournisseurs et acheteurs</small></p></div>
-  <div><span class="line-icon">▣</span><p><b>Informations claires</b><small>Caractéristiques et disponibilité</small></p></div>
-  <div><span class="line-icon">↗</span><p><b>Développez vos projets</b><small>Un réseau en construction</small></p></div>
-</section>
+    <nav class="quick-actions" aria-label="الخدمات الرئيسية">
+      <a class="quick-card orange-card" href="#publish"><span class="quick-icon" aria-hidden="true">📦</span><strong>أبحث عن حمولة</strong><small>Je cherche un chargement</small></a>
+      <a class="quick-card blue-card" href="#publish"><span class="quick-icon" aria-hidden="true">🚛</span><strong>لدي شاحنة</strong><small>J’ai un camion disponible</small></a>
+      <a class="quick-card teal-card" href="#messages"><span class="quick-icon" aria-hidden="true">💬</span><strong>رسائلي</strong><small>Mes discussions</small></a>
+      <a class="quick-card grey-card" href="#account"><span class="quick-icon" aria-hidden="true">👤</span><strong>حسابي</strong><small>Connexion / Déconnexion</small></a>
+    </nav>
 
-<section class="section categories" id="categories">
-  <div class="section-heading"><div><p class="eyebrow orange">EXPLOREZ LE CATALOGUE</p><h2>Nos catégories de produits</h2><p>Les principales familles de produits métalliques au même endroit.</p></div><a class="text-link" href="#produits">Voir les produits <span>→</span></a></div>
-  <div class="category-grid">
-    <a class="category-card" href="#produits" data-search="IPE HEA HEB UPN profilés poutrelles"><div class="category-image image-profiles"></div><div class="category-info"><h3>Profilés métalliques</h3><p>IPE, HEA, HEB, UPN</p><span>↗</span></div></a>
-    <a class="category-card" href="#produits" data-search="tubes carrés ronds rectangulaires"><div class="category-image image-tubes"></div><div class="category-info"><h3>Tubes acier</h3><p>Ronds, carrés, rectangulaires</p><span>↗</span></div></a>
-    <a class="category-card" href="#produits" data-search="tôles acier galvanisées larmées"><div class="category-image image-sheets"></div><div class="category-info"><h3>Tôles acier</h3><p>Noires, galvanisées, larmées</p><span>↗</span></div></a>
-    <a class="category-card" href="#produits" data-search="fer rond carré acier construction"><div class="category-image image-bars"></div><div class="category-info"><h3>Fer rond et carré</h3><p>Barres et aciers pleins</p><span>↗</span></div></a>
-    <a class="category-card" href="#produits" data-search="bobines acier galvanisé tôle"><div class="category-image image-coils"></div><div class="category-info"><h3>Bobines acier</h3><p>Bobines et tôles en rouleaux</p><span>↗</span></div></a>
-    <a class="category-card" href="#apropos" data-search="construction métallique charpente structure"><div class="category-image image-structure"></div><div class="category-info"><h3>Construction métallique</h3><p>Charpentes et structures</p><span>↗</span></div></a>
-  </div>
-</section>
-
-<section class="about-band" id="apropos">
-  <div class="welder-image" role="img" aria-label="Soudeur au travail dans un atelier métallique"></div>
-  <div class="about-copy"><p class="eyebrow orange">POUR LES PROFESSIONNELS</p><h2>Une plateforme pensée pour <span>le secteur du métal.</span></h2><p>MetaLink a pour ambition de rapprocher les fournisseurs, distributeurs, ateliers et entreprises de construction métallique. Découvrez des produits spécialisés et facilitez vos recherches professionnelles.</p><div class="benefits"><div><b>01</b><span><strong>Gagnez du temps</strong><small>Retrouvez les familles de produits essentielles.</small></span></div><div><b>02</b><span><strong>Élargissez votre réseau</strong><small>Faites connaître votre activité et vos besoins.</small></span></div><div><b>03</b><span><strong>Comparez les offres</strong><small>Demandez des informations directement aux fournisseurs.</small></span></div></div></div>
-</section>
-
-<section class="section products" id="produits">
-  <div class="section-heading"><div><p class="eyebrow orange">SÉLECTION MÉTALLURGIE</p><h2>Exemples de produits</h2><p>Catalogue de démonstration — les annonces réelles seront ajoutées ultérieurement.</p></div><span class="demo-tag">APERÇU DÉMO</span></div>
-  <div class="product-grid" id="productGrid">
-    <article class="product-card" data-name="Poutre IPE 200 profilé acier"><div class="product-image image-profiles"></div><div class="product-body"><span class="product-type">PROFILÉ</span><h3>Poutre IPE 200</h3><p>Longueur indicative : 12 m</p><div class="product-bottom"><span class="price">Sur demande</span><a href="#contact">Détails ↗</a></div></div></article>
-    <article class="product-card" data-name="Tube carré 80x80 acier"><div class="product-image image-tubes"></div><div class="product-body"><span class="product-type">TUBE</span><h3>Tube carré 80 × 80</h3><p>Épaisseur à confirmer selon offre</p><div class="product-bottom"><span class="price">Sur demande</span><a href="#contact">Détails ↗</a></div></div></article>
-    <article class="product-card" data-name="Tôle acier galvanisée"><div class="product-image image-sheets"></div><div class="product-body"><span class="product-type">TÔLE</span><h3>Tôle galvanisée</h3><p>Dimensions selon disponibilité</p><div class="product-bottom"><span class="price">Sur demande</span><a href="#contact">Détails ↗</a></div></div></article>
-    <article class="product-card" data-name="Fer rond acier rond à béton"><div class="product-image image-bars"></div><div class="product-body"><span class="product-type">ACIER PLEIN</span><h3>Fer rond acier</h3><p>Diamètre à préciser</p><div class="product-bottom"><span class="price">Sur demande</span><a href="#contact">Détails ↗</a></div></div></article>
-    <article class="product-card" data-name="Bobine acier galvanisé"><div class="product-image image-coils"></div><div class="product-body"><span class="product-type">BOBINE</span><h3>Bobine acier</h3><p>Épaisseur et largeur à préciser</p><div class="product-bottom"><span class="price">Sur demande</span><a href="#contact">Détails ↗</a></div></div></article>
-    <article class="product-card" data-name="Structure charpente métallique"><div class="product-image image-structure"></div><div class="product-body"><span class="product-type">SERVICE</span><h3>Charpente métallique</h3><p>Étude et réalisation sur projet</p><div class="product-bottom"><span class="price">Sur devis</span><a href="#contact">Détails ↗</a></div></div></article>
-  </div>
-  <p class="no-results" id="noResults" hidden>Aucun résultat dans ce catalogue de démonstration. Essayez un autre terme.</p>
-</section>
-
-<section class="logistics-section" id="logistique">
-  <div class="section logistics-inner">
-    <div class="section-heading"><div><p class="eyebrow orange">CHAPITRE 2 · TRANSPORT</p><h2>MetaLink Logistique</h2><p>Reliez les chargements de produits métalliques aux transporteurs disponibles.</p></div><span class="demo-tag">APERÇU DÉMO</span></div>
-    <div class="logistics-layout">
-      <div class="route-card">
-        <div class="route-head"><span class="offer-pill"><i></i> OFFRE DE RETOUR</span><span class="available-pill">Disponibilité à confirmer</span></div>
-        <div class="route-cities"><div><small>DÉPART</small><strong>Annaba</strong></div><span class="route-arrow">→</span><div><small>ARRIVÉE</small><strong>Blida</strong></div></div>
-        <div class="route-details">
-          <div><span>Marchandise</span><strong>20 t de poutrelles IPE</strong></div>
-          <div><span>Transport</span><strong>Porteur / semi-remorque</strong></div>
-          <div><span>Chauffeur</span><strong>Hamid · exemple</strong></div>
-          <div><span>Prix indicatif</span><strong>30 000 DA · à confirmer</strong></div>
-        </div>
-        <div class="truck-banner" role="img" aria-label="Camion transportant des poutrelles métalliques"></div>
-        <p class="demo-disclaimer">Scénario fictif de démonstration. Le chauffeur, le trajet, le prix et la disponibilité ne sont pas vérifiés.</p>
-        <a class="btn logistics-contact" href="#contact">Demander les informations <span>→</span></a>
+    <section class="panel" id="publish">
+      <div class="section-title"><span class="title-icon">🛣️</span><div><h2>النقل والحمولات</h2><p>Publiez une offre ou trouvez un transport.</p></div></div>
+      <div class="switcher" role="tablist" aria-label="نوع الطلب">
+        <button class="switch active" type="button" data-panel="carrierPanel" role="tab" aria-selected="true">🚛 لدي شاحنة</button>
+        <button class="switch" type="button" data-panel="shipperPanel" role="tab" aria-selected="false">📦 أبحث عن نقل</button>
       </div>
-      <div class="logistics-side">
-        <div class="logistics-feature"><span class="feature-icon">↔</span><div><h3>Offres de retour</h3><p>Valorisez un trajet retour lorsqu'un transporteur cherche un chargement compatible.</p></div></div>
-        <div class="logistics-feature"><span class="feature-icon">▤</span><div><h3>Détails du chargement</h3><p>Indiquez le type de profilé, le tonnage, les dimensions et les conditions de chargement.</p></div></div>
-        <div class="logistics-feature"><span class="feature-icon">☏</span><div><h3>Discussion client–chauffeur</h3><p>Préparez les échanges sur le prix, le lieu, l'horaire et la confirmation du transport.</p></div></div>
-        <div class="logistics-feature"><span class="feature-icon">⌖</span><div><h3>Trajet et étapes</h3><p>Une future version pourra intégrer une carte et le suivi du transport, avec consentement.</p></div></div>
-        <div class="chat-preview"><div class="chat-top"><span class="chat-avatar">UF+</span><span><b>Ultra Fer +</b><small>Exemple de conversation</small></span></div><div class="bubble">Bonjour Hamid, votre offre Annaba → Blida est-elle disponible ?</div><div class="bubble reply">Bonjour, disponibilité à confirmer. Envoyez les détails du chargement.</div><small class="chat-note">Conversation illustrative — aucune messagerie n'est encore connectée.</small></div>
+      <div class="form-panel active" id="carrierPanel">
+        <form id="carrierForm" class="simple-form">
+          <label>📍 من أين؟ <div class="voice-field"><input name="origin" id="carrierOrigin" required placeholder="مثال: سطيف"><button class="voice-button" type="button" data-voice-for="carrierOrigin" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>📍 إلى أين؟ <div class="voice-field"><input name="destination" id="carrierDestination" required placeholder="مثال: الجزائر"><button class="voice-button" type="button" data-voice-for="carrierDestination" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>🚚 نوع الشاحنة<select name="vehicle" required><option value="">اختر نوع الشاحنة</option><option>شاحنة صغيرة</option><option>شاحنة 8 طن</option><option>شاحنة 10–15 طن</option><option>نصف مقطورة</option><option>شاحنة مسطحة للحديد</option><option>Autre camion</option></select></label>
+          <label>⚖️ الحمولة بالطن<input name="capacity" type="number" min="0.5" step="0.5" required placeholder="مثال: 20"></label>
+          <label>📅 تاريخ التوفر<input name="date" type="date" required></label>
+          <label>📞 رقم الهاتف<input name="phone" id="carrierPhone" type="tel" inputmode="tel" required placeholder="رقم الهاتف"></label>
+          <label>📦 نوع الحمولة (اختياري)<div class="voice-field"><input name="cargo" id="carrierCargo" placeholder="حديد، أنابيب، أي حمولة"><button class="voice-button" type="button" data-voice-for="carrierCargo" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>💰 السعر بالدينار (اختياري)<input name="price" type="number" min="0" placeholder="اتفاق بين الطرفين"></label>
+          <button class="primary-button submit-button" type="submit">✅ نشر الشاحنة</button>
+        </form>
       </div>
-    </div>
-  </div>
-</section>
+      <div class="form-panel" id="shipperPanel">
+        <form id="shipperForm" class="simple-form">
+          <label>📍 مكان التحميل <div class="voice-field"><input name="origin" id="shipperOrigin" required placeholder="مثال: سطيف"><button class="voice-button" type="button" data-voice-for="shipperOrigin" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>📍 مكان التسليم <div class="voice-field"><input name="destination" id="shipperDestination" required placeholder="مثال: وهران"><button class="voice-button" type="button" data-voice-for="shipperDestination" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>📦 نوع البضاعة<select name="cargoType" required><option value="">اختر نوع البضاعة</option><option>حديد IPE / HEA / HEB</option><option>أنابيب حديدية</option><option>صفائح حديدية</option><option>حديد دائري أو مربع</option><option>مواد أخرى</option></select></label>
+          <label>⚖️ الوزن بالطن<input name="weight" type="number" min="0.1" step="0.1" required placeholder="مثال: 18"></label>
+          <label>📅 تاريخ النقل<input name="date" type="date" required></label>
+          <label>📞 رقم الهاتف<input name="phone" id="shipperPhone" type="tel" inputmode="tel" required placeholder="رقم الهاتف"></label>
+          <label>📝 تفاصيل (اختياري)<div class="voice-field"><input name="details" id="shipperDetails" placeholder="تفاصيل إضافية"><button class="voice-button" type="button" data-voice-for="shipperDetails" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>💰 الميزانية بالدينار (اختياري)<input name="budget" type="number" min="0" placeholder="قابلة للتفاوض"></label>
+          <button class="primary-button submit-button" type="submit">✅ نشر طلب النقل</button>
+        </form>
+      </div>
+      <p id="logisticsStatus" class="status-message" role="status" hidden></p>
+    </section>
 
+    <section class="panel" id="loads">
+      <div class="section-title"><span class="title-icon">🧭</span><div><h2>الحمولات والشاحنات المنشورة</h2><p>العروض والطلبات المسجلة في MetaLink.</p></div><button id="refreshListings" class="small-button" type="button" aria-label="تحديث">↻</button></div>
+      <div id="logisticsListings" class="listing-list"><p class="empty-state">جارٍ تحميل الإعلانات…</p></div>
+    </section>
 
-<section class="section logistics-market" id="publier-transport">
-  <div class="section-heading">
-    <div><p class="eyebrow orange">TRANSPORT À DOUBLE SENS</p><h2>Publier une offre ou chercher un transport</h2><p>Les transporteurs proposent leurs véhicules et trajets retour. Les clients publient leurs besoins d’expédition de produits métalliques.</p></div>
-    <span class="demo-tag">ANNONCES EN LIGNE</span>
-  </div>
-  <div class="logistics-tabs" role="tablist" aria-label="Type d'annonce">
-    <button class="logistics-tab active" type="button" data-panel="carrierPanel" role="tab" aria-selected="true">🚚 Je suis transporteur</button>
-    <button class="logistics-tab" type="button" data-panel="shipperPanel" role="tab" aria-selected="false">📦 Je cherche un transport</button>
-  </div>
-  <div class="publish-grid">
-    <form class="publish-form" id="carrierForm">
-      <div class="form-title"><span>01</span><div><h3>Publier un camion disponible</h3><p>Pour un transporteur ou un chauffeur</p></div></div>
-      <div class="form-row"><label>Ville de départ<input name="origin" required placeholder="Ex. Annaba"></label><label>Destination / trajet retour<input name="destination" required placeholder="Ex. Blida"></label></div>
-      <div class="form-row"><label>Type de véhicule<select name="vehicle" required><option value="">Choisir</option><option>Camion 3,5 tonnes</option><option>Camion 8 tonnes</option><option>Camion 10–15 tonnes</option><option>Semi-remorque</option><option>Plateau / porte-acier</option></select></label><label>Charge utile (tonnes)<input name="capacity" type="number" min="0.5" step="0.5" required placeholder="Ex. 20"></label></div>
-      <div class="form-row"><label>Disponible à partir du<input name="date" type="date" required></label><label>Prix souhaité (DA, facultatif)<input name="price" type="number" min="0" placeholder="À négocier"></label></div>
-      <label>Marchandises acceptées<textarea name="cargo" rows="2" placeholder="IPE, HEA, tubes, tôles…"></textarea></label>
-      <label>Téléphone de contact<input name="phone" type="tel" required placeholder="Ex. 05 xx xx xx xx"></label>
-      <button class="btn" type="submit">Publier l’offre de transport <span>→</span></button>
-    </form>
-    <form class="publish-form" id="shipperForm">
-      <div class="form-title"><span>02</span><div><h3>Demander un transport</h3><p>Pour un fournisseur, acheteur ou chantier</p></div></div>
-      <div class="form-row"><label>Ville de chargement<input name="origin" required placeholder="Ex. Alger, port"></label><label>Ville de livraison<input name="destination" required placeholder="Ex. Blida"></label></div>
-      <div class="form-row"><label>Type de marchandise<select name="cargoType" required><option value="">Choisir</option><option>IPE / HEA / HEB / UPN</option><option>Tubes acier</option><option>Tôles acier</option><option>Fer rond ou carré</option><option>Autre produit métallique</option></select></label><label>Poids estimé (tonnes)<input name="weight" type="number" min="0.1" step="0.1" required placeholder="Ex. 20"></label></div>
-      <div class="form-row"><label>Date souhaitée<input name="date" type="date" required></label><label>Budget transport (DA, facultatif)<input name="budget" type="number" min="0" placeholder="À négocier"></label></div>
-      <label>Dimensions / informations du chargement<textarea name="details" rows="2" placeholder="Longueur des profilés, accès au site, chargement…"></textarea></label>
-      <label>Téléphone de contact<input name="phone" type="tel" required placeholder="Ex. 05 xx xx xx xx"></label>
-      <button class="btn" type="submit">Publier ma demande <span>→</span></button>
-    </form>
-  </div>
-  <div class="demo-status" id="logisticsStatus" aria-live="polite" hidden></div>
-  <div class="demo-list-wrap"><div class="demo-list-heading"><div><p class="eyebrow orange">ANNONCES ENREGISTRÉES</p><h3>Offres et demandes ajoutées</h3></div><span class="demo-tag">BASE DE DONNÉES</span></div><div id="logisticsListings" class="logistics-listings"><p class="empty-list">Aucune annonce ajoutée pour le moment. Testez l’un des formulaires ci-dessus.</p></div><p class="storage-note">Les annonces publiées sont enregistrées dans la base de données MetaLink et peuvent être consultées par les visiteurs. Publiez uniquement les coordonnées professionnelles que vous acceptez de rendre visibles.</p></div>
-</section>
+    <section class="panel" id="messages">
+      <div class="section-title"><span class="title-icon">💬</span><div><h2>رسائلي</h2><p>محادثات خاصة بين صاحب الطلب والسائق.</p></div><button id="refreshConversations" class="small-button" type="button" aria-label="تحديث الرسائل">↻</button></div>
+      <div id="conversationList" class="conversation-list"><p class="empty-state">سجّل الدخول لعرض رسائلك.</p></div>
+      <div id="chatPanel" class="chat-panel" hidden>
+        <div class="chat-heading"><button id="backToConversations" class="small-button" type="button" aria-label="العودة">→</button><div><strong id="chatTitle">محادثة النقل</strong><small id="chatSubtitle">رسائل خاصة</small></div><button id="refreshMessages" class="small-button" type="button" aria-label="تحديث المحادثة">↻</button></div>
+        <div id="chatMessages" class="chat-messages" aria-live="polite"><p class="empty-state">لا توجد رسائل بعد.</p></div>
+        <form id="chatForm" class="chat-form"><div class="voice-field"><input id="chatInput" maxlength="1000" placeholder="اكتب رسالتك أو استخدم الصوت" required><button class="voice-button" type="button" data-voice-for="chatInput" aria-label="إملاء الرسالة">🎙️</button></div><button class="primary-button" type="submit">إرسال ➤</button></form>
+        <p id="chatStatus" class="status-message" role="status"></p>
+      </div>
+    </section>
 
-<section class="cta" id="fournisseurs"><div><p class="eyebrow">VOUS ÊTES FOURNISSEUR OU ACHETEUR ?</p><h2>Le prochain projet commence par une connexion.</h2><p>Préparez votre présence sur une plateforme dédiée aux professionnels du métal.</p></div><a class="btn" href="#contact">Découvrir MetaLink <span>→</span></a></section>
+    <section class="panel" id="account">
+      <div class="section-title"><span class="title-icon">👤</span><div><h2>حسابي</h2><p>الدخول والنشر الآمن.</p></div></div>
+      <div class="account-card">
+        <div class="auth-switch"><button id="signInMode" class="auth-tab active" type="button">دخول</button><button id="signUpMode" class="auth-tab" type="button">حساب جديد</button></div>
+        <form id="authForm" class="simple-form">
+          <label>📧 البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com" dir="ltr"></label>
+          <label>🔑 كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل" dir="ltr"></label>
+          <button id="authSubmit" class="primary-button" type="submit">دخول</button>
+        </form>
+        <button id="resetPassword" class="text-button" type="button">نسيت كلمة المرور؟</button>
+        <button id="signOutButton" class="danger-button" type="button" hidden>خروج من الحساب</button>
+        <p id="authStatus" class="status-message" role="status">لم تسجل الدخول بعد.</p>
+      </div>
+    </section>
 
+    <section class="panel advertising-panel" id="advertising">
+      <div class="section-title"><span class="title-icon">📣</span><div><h2>طلب إشهار للشركات</h2><p>لشركات النقل والحديد مثل تيرصام.</p></div></div>
+      <details>
+        <summary>فتح طلب الإشهار</summary>
+        <form id="adRequestForm" class="simple-form details-form">
+          <label>اسم الشركة<input name="company" required placeholder="مثال: Tirsam"></label>
+          <label>نوع الإشهار<select name="adType" required><option value="">اختر</option><option>الشاحنات والنقل</option><option>منتجات الحديد</option><option>البناء المعدني</option><option>مقاومة التآكل</option><option>نوع آخر</option></select></label>
+          <label>التصميم المطلوب<select name="style" required><option value="">اختر</option><option>تصميم نقل حديث</option><option>تصميم صناعي وحديد</option><option>مقاومة التآكل</option><option>تصميم آخر</option></select></label>
+          <label>ماذا تريد في الإعلان؟<div class="voice-field"><textarea name="brief" id="adBrief" rows="3" required placeholder="اكتب أو أمْلِ طلبك"></textarea><button class="voice-button" type="button" data-voice-for="adBrief" aria-label="إملاء الطلب">🎙️</button></div></label>
+          <label>الهاتف أو البريد<input name="contact" required placeholder="وسيلة التواصل"></label>
+          <button class="primary-button" type="submit">إرسال طلب الإشهار</button>
+          <p id="adRequestStatus" class="status-message" role="status">يتطلب إرسال الطلب تسجيل الدخول.</p>
+        </form>
+      </details>
+    </section>
+  </main>
+  <footer><span class="brand-icon">M</span><span>MetaLink Logistique</span><small>منصة النقل في الجزائر · إصدار أولي</small></footer>
 
-
-<section class="section driver-chat-section" id="chauffeur-chat">
-  <div class="section-heading">
-    <div><p class="eyebrow orange">ÉCHANGE TRANSPORTEUR · CLIENT</p><h2>Discussion transport retour</h2><p>Exemple de discussion entre Hamid, chauffeur, et Ultra Fer, client professionnel.</p></div>
-    <span class="demo-tag">APERÇU DE DÉMONSTRATION</span>
-  </div>
-  <div class="driver-chat-card">
-    <div class="driver-chat-header"><div class="driver-avatar">H</div><div><strong>Hamid · Chauffeur</strong><small>Trajet retour · Annaba → Blida</small></div><span class="chat-online">Exemple</span></div>
-    <div class="driver-chat-route"><span>ANNABA</span><span>→</span><span>BLIDA</span><small>Camion plateau · capacité indicative 20 t</small></div>
-    <div class="driver-chat-messages" id="driverChatMessages" aria-live="polite">
-      <div class="chat-message client"><small>Ultra Fer · Client</small><p>Bonjour Hamid, votre camion sera-t-il disponible pour un transport retour vers Blida ? Nous avons des poutrelles IPE.</p><time>Exemple de message</time></div>
-      <div class="chat-message driver"><small>Hamid · Chauffeur</small><p>Bonjour ! Je peux étudier le chargement. Quel est le tonnage, la longueur des poutrelles et l’adresse de chargement ?</p><time>Exemple de message</time></div>
-      <div class="chat-message client"><small>Ultra Fer · Client</small><p>Environ 18 tonnes. Pouvez-vous confirmer le prix, l’horaire et les conditions de chargement avant de réserver ?</p><time>Exemple de message</time></div>
-      <div class="chat-message driver"><small>Hamid · Chauffeur</small><p>Bien reçu. Je confirme la disponibilité et le tarif après vérification. Ne considérons le transport comme réservé qu’après accord des deux côtés.</p><time>Exemple de message</time></div>
-    </div>
-    <form class="chat-demo-composer" id="chatDemoForm"><label for="chatDemoInput">Tester l’aperçu de discussion</label><div><input id="chatDemoInput" maxlength="400" placeholder="Écrire un message de démonstration…" required><button class="btn" type="submit">Envoyer ↗</button></div><p id="chatDemoStatus" aria-live="polite">Simulation uniquement : les messages de cet aperçu ne sont pas envoyés ni enregistrés.</p></form>
-  </div>
-</section>
-
-<section class="section ad-request-section" id="publicite">
-  <div class="section-heading">
-    <div><p class="eyebrow orange">PUBLICITÉ PROFESSIONNELLE</p><h2>Demander une publicité MetaLink</h2><p>Une entreprise peut demander une campagne pour ses camions, ses produits ou ses services.</p></div>
-    <span class="demo-tag">EXEMPLE DE BRIEF</span>
-  </div>
-  <div class="ad-request-layout">
-    <div class="ad-showcase">
-      <div class="ad-showcase-top"><span class="ad-sponsored">EXEMPLE · PUBLICITÉ</span><span class="ad-company-mark">T</span></div>
-      <div class="ad-truck-art" role="img" aria-label="Illustration de camion de transport pour un exemple de publicité"></div>
-      <div class="ad-showcase-copy"><p class="eyebrow orange">CAMPAGNE CAMION · EXEMPLE FICTIF</p><h3>Votre flotte, visible auprès des professionnels.</h3><p>Visuel de camion, itinéraires, capacité et coordonnées commerciales — à valider par l’entreprise avant publication.</p><span class="ad-style-chip">Style transport</span><span class="ad-style-chip">Style anticorrosion</span></div>
-    </div>
-    <form class="ad-request-form" id="adRequestForm">
-      <h3>Brief de publicité</h3><p>Exemple de demande pour une entreprise telle que Tirsam. Ce formulaire n’est pas encore relié à l’enregistrement des demandes.</p>
-      <label>Nom de l’entreprise<input name="company" required placeholder="Ex. Tirsam"></label>
-      <label>Type de publicité<select name="adType" required><option value="">Choisir une campagne</option><option>Camions et flotte de transport</option><option>Produits métalliques</option><option>Construction métallique</option><option>Service anticorrosion</option><option>Autre</option></select></label>
-      <label>Style souhaité<select name="style" required><option value="">Choisir un style</option><option>Style transport moderne</option><option>Style industriel / acier</option><option>Style anticorrosion</option><option>Un autre style svp</option></select></label>
-      <label>Votre demande<textarea name="brief" rows="3" required placeholder="Ex. publicité pour nos camions, couleurs, texte et coordonnées à afficher…"></textarea></label>
-      <label>Téléphone ou e-mail professionnel<input name="contact" required placeholder="Coordonnées de contact"></label>
-      <button class="btn" type="submit">Préparer le brief publicitaire ↗</button>
-      <p id="adRequestStatus" class="ad-form-status" aria-live="polite">Le brief peut être préparé ici, mais il ne sera pas transmis tant que le stockage sécurisé n’est pas activé.</p>
-    </form>
-  </div>
-</section>
-
-<section class="section auth-section" id="auth">
-  <div class="auth-intro"><p class="eyebrow orange">ESPACE PROFESSIONNEL</p><h2>Connexion à MetaLink</h2><p>Connectez-vous pour publier une offre de transport ou une demande. Les annonces sont associées à votre compte.</p></div>
-  <div class="auth-card">
-    <div class="auth-tabs"><button type="button" class="auth-tab active" id="signInMode">Connexion</button><button type="button" class="auth-tab" id="signUpMode">Créer un compte</button></div>
-    <form id="authForm">
-      <label>Adresse e-mail<input id="authEmail" type="email" autocomplete="email" required placeholder="vous@entreprise.com"></label>
-      <label>Mot de passe<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="Au moins 6 caractères"></label>
-      <button class="btn" id="authSubmit" type="submit">Se connecter →</button>
-    </form>
-    <button class="auth-reset" id="resetPassword" type="button">Mot de passe oublié ?</button>
-    <div class="auth-status" id="authStatus" aria-live="polite">Vous n’êtes pas connecté.</div>
-    <button class="auth-signout" id="signOutButton" type="button" hidden>Se déconnecter</button>
-  </div>
-</section>
-
-<section class="contact-section" id="contact"><div><p class="eyebrow orange">RESTONS EN CONTACT</p><h2>Construisons le réseau MetaLink.</h2><p>La connexion et les annonces de transport utilisent Supabase. Les autres fonctions seront activées progressivement.</p></div><form id="contactForm"><label>Votre profil<select required><option value="">Sélectionner</option><option>Fournisseur</option><option>Acheteur</option><option>Entreprise de construction métallique</option><option>Autre professionnel</option></select></label><label>Votre adresse e-mail<input type="email" placeholder="vous@entreprise.com" required></label><button class="btn" type="submit">Préparer ma demande →</button><p id="formMessage" aria-live="polite"></p></form></section>
-</main>
-
-<footer><a class="brand" href="#accueil"><span class="brand-mark">∞</span><span><b>Meta<span>Link</span></b><small>Le métal connecte vos projets</small></span></a><p>La place de marché dédiée aux professionnels du métal.</p><small>© 2026 MetaLink — Version de démonstration. Les produits affichés sont des exemples, pas des offres commerciales.</small></footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
