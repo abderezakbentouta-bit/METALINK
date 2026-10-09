@@ -98,6 +98,16 @@
       <div class="account-card">
         <div class="auth-switch"><button id="signInMode" class="auth-tab active" type="button">دخول</button><button id="signUpMode" class="auth-tab" type="button">حساب جديد</button></div>
         <form id="authForm" class="simple-form">
+          <div id="signupFields" class="signup-fields" hidden>
+            <label>👥 نوع الحساب<select id="accountType" name="accountType" required><option value="driver">🚛 سائق</option><option value="client">📦 زبون / صاحب حمولة</option><option value="supplier">🏭 مورد</option><option value="individual">👤 شخص</option><option value="company">🏢 شركة</option></select></label>
+            <label>👤 الاسم الكامل أو اسم المؤسسة<input id="accountDisplayName" name="displayName" maxlength="120" required placeholder="اسمك أو اسم الشركة"></label>
+            <label>📞 رقم الهاتف<input id="accountPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required placeholder="رقم الهاتف"></label>
+            <label>📍 الولاية<select id="accountWilaya" name="wilaya" required>
+              <option value="">اختر الولاية</option><option>أدرار</option><option>الشلف</option><option>الأغواط</option><option>أم البواقي</option><option>باتنة</option><option>بجاية</option><option>بسكرة</option><option>بشار</option><option>البليدة</option><option>البويرة</option><option>تمنراست</option><option>تبسة</option><option>تلمسان</option><option>تيارت</option><option>تيزي وزو</option><option>الجزائر</option><option>الجلفة</option><option>جيجل</option><option>سطيف</option><option>سعيدة</option><option>سكيكدة</option><option>سيدي بلعباس</option><option>عنابة</option><option>قالمة</option><option>قسنطينة</option><option>المدية</option><option>مستغانم</option><option>المسيلة</option><option>معسكر</option><option>ورقلة</option><option>وهران</option><option>البيض</option><option>إليزي</option><option>برج بوعريريج</option><option>بومرداس</option><option>الطارف</option><option>تندوف</option><option>تيسمسيلت</option><option>الوادي</option><option>خنشلة</option><option>سوق أهراس</option><option>تيبازة</option><option>ميلة</option><option>عين الدفلى</option><option>النعامة</option><option>عين تموشنت</option><option>غرداية</option><option>غليزان</option><option>تيميمون</option><option>برج باجي مختار</option><option>أولاد جلال</option><option>بني عباس</option><option>عين صالح</option><option>عين قزام</option><option>تقرت</option><option>جانت</option><option>المغير</option><option>المنيعة</option>
+            </select></label>
+            <label>📍 البلدية<input id="accountCommune" name="commune" maxlength="100" required placeholder="اسم البلدية"></label>
+            <p class="profile-photo-note">البريد الإلكتروني وكلمة المرور للدخول. الهاتف والاسم والولاية والبلدية لتسهيل التواصل.</p>
+          </div>
           <label>📧 البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com" dir="ltr"></label>
           <label>🔑 كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل" dir="ltr"></label>
           <button id="authSubmit" class="primary-button" type="submit">دخول</button>
