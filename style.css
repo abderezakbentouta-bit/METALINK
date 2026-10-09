@@ -178,3 +178,20 @@ footer small{width:100%;font-size:11px;color:#b8cbd5}
 .footer-brand-image{width:36px;height:36px;flex-basis:36px}
 
 .switcher .switch{line-height:1.45;min-height:48px}
+
+
+/* Personal account dashboard */
+.dashboard-panel{border-top:4px solid var(--orange)}
+.dashboard-guest{padding:10px 0;text-align:center;color:var(--muted)}
+.dashboard-cta{max-width:320px;margin:12px auto 0}
+.dashboard-welcome{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;background:linear-gradient(110deg,#102b3f,#205b76);color:#fff}
+.dashboard-avatar{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#ffffff20;font-size:27px}
+.dashboard-welcome strong,.dashboard-welcome small{display:block;overflow-wrap:anywhere}
+.dashboard-welcome strong{font-size:17px}.dashboard-welcome small{font-size:12px;color:#d1e2ea;margin-top:2px}
+.dashboard-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.dashboard-stat{display:grid;gap:3px;align-content:center;text-align:center;min-height:84px;padding:8px 4px;border:1px solid var(--line);border-radius:12px;background:#f7fafb}
+.dashboard-stat strong{font-size:26px;color:var(--navy)}.dashboard-stat span{font-size:11px;color:var(--muted);font-weight:750}
+.dashboard-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dashboard-actions a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:9px 7px;border-radius:11px;border:1px solid #cbdbe2;background:#edf5f8;color:#17465c;font-size:13px;font-weight:850;text-align:center}
+.dashboard-own{margin-top:16px}.dashboard-own h3{margin:0 0 9px;font-size:16px;color:var(--navy)}.dashboard-own-list{display:grid;gap:8px}
+.dashboard-own-item{display:grid;gap:3px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff}.dashboard-own-item strong{font-size:13px;color:var(--navy)}.dashboard-own-item span{font-size:13px;color:var(--muted)}
