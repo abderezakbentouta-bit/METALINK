@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'dz.met alink.logistique'.replace(' ', '')
+    namespace 'dz.metalink.logistique'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'dz.met alink.logistique'.replace(' ', '')
+        applicationId 'dz.metalink.logistique'
         minSdk 23
         targetSdk 35
         versionCode 1
