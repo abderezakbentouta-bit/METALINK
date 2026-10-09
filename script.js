@@ -105,7 +105,9 @@
     $('signUpMode').classList.toggle('active', mode === 'signup');
     $('authSubmit').textContent = mode === 'signup' ? 'إنشاء حساب' : 'دخول';
     $('authPassword').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
-    showStatus($('authStatus'), mode === 'signup' ? 'أنشئ حسابًا بالبريد الإلكتروني وكلمة مرور من 6 أحرف على الأقل.' : 'أدخل بريدك الإلكتروني وكلمة المرور للدخول.');
+    $('signupFields').hidden = mode !== 'signup';
+    ['accountType','accountDisplayName','accountPhone','accountWilaya','accountCommune'].forEach((id) => { $(id).required = mode === 'signup'; });
+    showStatus($('authStatus'), mode === 'signup' ? 'اختر نوع الحساب وأدخل الاسم والهاتف والولاية والبلدية.' : 'أدخل بريدك الإلكتروني وكلمة المرور للدخول.');
   }
   $('signInMode').addEventListener('click', () => setAuthMode('signin'));
   $('signUpMode').addEventListener('click', () => setAuthMode('signup'));
@@ -239,9 +241,14 @@
       $('authEmail').value = currentUser.email || '';
       $('authPassword').value = '';
       fillDriverProfile(currentUser);
-      const profileComplete = isDriverProfileComplete(readDriverProfile(currentUser));
+      const accountType = currentUser.user_metadata?.account_type || 'driver';
+      const profileComplete = accountType !== 'driver' || isDriverProfileComplete(readDriverProfile(currentUser));
+      $('driverProfileModal').hidden = accountType !== 'driver' || isDriverProfileComplete(readDriverProfile(currentUser));
+      $('editDriverProfile').hidden = accountType !== 'driver';
+      const roleLabel = ({driver:'سائق',client:'زبون',supplier:'مورد',individual:'شخص',company:'شركة'})[accountType] || 'مستخدم';
+      $('accountLabel').textContent = roleLabel;
       showStatus($('authStatus'), profileComplete
-        ? 'أنت متصل الآن. يمكنك نشر الحمولة وفتح الرسائل.'
+        ? 'أنت متصل الآن. يمكنك استعمال خدمات MetaLink.'
         : 'أكمل ملف السائق في النافذة المنبثقة لحفظ بياناتك قبل نشر الشاحنة.', profileComplete ? 'success' : '');
       loadConversations();
     } else {
@@ -271,9 +278,20 @@
       const email = $('authEmail').value.trim();
       const password = $('authPassword').value;
       if (authMode === 'signup') {
+        const accountType = $('accountType').value;
+        const signupMetadata = {
+          account_type: accountType,
+          display_name: $('accountDisplayName').value.trim(),
+          contact_phone: $('accountPhone').value.trim(),
+          wilaya: $('accountWilaya').value,
+          commune: $('accountCommune').value.trim()
+        };
         const {data, error} = await db.auth.signUp({
           email, password,
-          options: {emailRedirectTo: window.location.origin + window.location.pathname}
+          options: {
+            emailRedirectTo: window.location.origin + window.location.pathname,
+            data: signupMetadata
+          }
         });
         if (error) throw error;
         if (data.session && data.user) updateAuthUI(data.user);
