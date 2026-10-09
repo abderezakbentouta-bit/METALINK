@@ -134,6 +134,8 @@
       $('chatPanel').hidden = true;
       renderConversations();
     }
+    // Re-render announcement actions when the login state changes.
+    loadListings();
   }
 
   $('authForm').addEventListener('submit', async (event) => {
