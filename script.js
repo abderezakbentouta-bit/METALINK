@@ -123,6 +123,10 @@
     };
   }
 
+  function isDriverProfileComplete(profile) {
+    return Boolean(profile?.fullName && profile?.plate && profile?.residence && profile?.phone && profile?.photoUrl);
+  }
+
   function fillDriverProfile(user) {
     const profile = readDriverProfile(user);
     savedDriverProfile = profile;
@@ -134,8 +138,18 @@
     $('driverPhoto').required = !profile.photoUrl;
     $('driverPhotoPreview').hidden = !profile.photoUrl;
     $('driverPhotoPreview').src = profile.photoUrl || '';
-    $('driverProfileSection').hidden = !user;
+    // First-time or incomplete profiles are collected in a dedicated modal.
+    $('driverProfileModal').hidden = !user || isDriverProfileComplete(profile);
+    $('editDriverProfile').hidden = !user;
   }
+
+  $('editDriverProfile').addEventListener('click', () => {
+    if (currentUser) {
+      fillDriverProfile(currentUser);
+      $('driverProfileModal').hidden = false;
+      $('driverFullName').focus();
+    }
+  });
 
   $('driverPhoto').addEventListener('change', () => {
     const file = $('driverPhoto').files?.[0];
@@ -225,10 +239,14 @@
       $('authEmail').value = currentUser.email || '';
       $('authPassword').value = '';
       fillDriverProfile(currentUser);
-      showStatus($('authStatus'), 'أنت متصل الآن. يمكنك نشر الحمولة وفتح الرسائل.', 'success');
+      const profileComplete = isDriverProfileComplete(readDriverProfile(currentUser));
+      showStatus($('authStatus'), profileComplete
+        ? 'أنت متصل الآن. يمكنك نشر الحمولة وفتح الرسائل.'
+        : 'أكمل ملف السائق في النافذة المنبثقة لحفظ بياناتك قبل نشر الشاحنة.', profileComplete ? 'success' : '');
       loadConversations();
     } else {
-      $('driverProfileSection').hidden = true;
+      $('driverProfileModal').hidden = true;
+      $('editDriverProfile').hidden = true;
       savedDriverProfile = null;
       $('authEmail').readOnly = false;
       $('authPassword').hidden = false;
@@ -385,8 +403,8 @@
         const profile = readDriverProfile();
         if (!profile.fullName || !profile.plate || !profile.residence || !profile.phone || !profile.photoUrl) {
           showStatus($('driverProfileStatus'), 'أكمل اسم السائق وترقيم الشاحنة ومكان الإقامة والهاتف والصورة، ثم احفظ الملف.', 'error');
-          $('driverProfileSection').hidden = false;
-          $('driverProfileSection').scrollIntoView({behavior:'smooth', block:'start'});
+          $('driverProfileModal').hidden = false;
+          $('driverFullName').focus();
           return;
         }
       }
