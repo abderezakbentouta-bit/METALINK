@@ -137,3 +137,10 @@ footer small{width:100%;font-size:11px;color:#b8cbd5}
 .sponsor-bottom{margin-top:20px}
 @media(min-width:600px){.sponsor-card{grid-template-columns:170px minmax(0,1fr)}.sponsor-visual{min-height:170px}.sponsor-info{padding:16px}.sponsor-info h2{font-size:19px}}
 @media(max-width:360px){.sponsor-card{grid-template-columns:96px minmax(0,1fr)}.sponsor-visual{padding:7px}.truck-art{font-size:36px}.sponsor-info{padding:9px}.sponsor-info h2{font-size:15px}.sponsor-phones a{font-size:12px}}
+
+/* Real product photos in sponsor banners */
+.sponsor-visual{position:relative;overflow:hidden;padding:0;gap:0}
+.sponsor-photo{display:block;width:100%;height:100%;min-height:150px;object-fit:cover;object-position:center;background:#e8eef1}
+.tirsam-visual .sponsor-photo{object-fit:contain;background:#f5f7f8}
+.photo-caption{position:absolute;inset:auto 0 0;padding:7px 5px;text-align:center;background:#102b3fdd;color:#fff;font-size:11px;font-weight:850}
+@media(min-width:600px){.sponsor-photo{min-height:170px}}
