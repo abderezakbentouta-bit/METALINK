@@ -102,8 +102,8 @@
   let phoneOtpRequested = false;
   $('phoneAuthForm').addEventListener('submit', async (event) => {
     event.preventDefault();
-    const phone = $('authPhone').value.trim().replace(/[\\s().-]/g, '');
-    if (!/^\\+[1-9]\\d{7,14}$/.test(phone)) {
+    const phone = $('authPhone').value.trim().replace(/[\s().-]/g, '');
+    if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
       showStatus($('authStatus'), 'اكتب رقم الهاتف مع مفتاح الدولة، مثال: +213555123456', 'error');
       return;
     }
@@ -122,9 +122,9 @@
   });
   $('verifyPhoneCode').addEventListener('click', async () => {
     if (!phoneOtpRequested) return;
-    const phone = $('authPhone').value.trim().replace(/[\\s().-]/g, '');
+    const phone = $('authPhone').value.trim().replace(/[\s().-]/g, '');
     const token = $('authPhoneCode').value.trim();
-    if (!/^\\d{6}$/.test(token)) {
+    if (!/^\d{6}$/.test(token)) {
       showStatus($('authStatus'), 'أدخل رمز التحقق المكوّن من 6 أرقام.', 'error');
       return;
     }
