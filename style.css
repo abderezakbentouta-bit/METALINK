@@ -195,3 +195,37 @@ footer small{width:100%;font-size:11px;color:#b8cbd5}
 .dashboard-actions a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:9px 7px;border-radius:11px;border:1px solid #cbdbe2;background:#edf5f8;color:#17465c;font-size:13px;font-weight:850;text-align:center}
 .dashboard-own{margin-top:16px}.dashboard-own h3{margin:0 0 9px;font-size:16px;color:var(--navy)}.dashboard-own-list{display:grid;gap:8px}
 .dashboard-own-item{display:grid;gap:3px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff}.dashboard-own-item strong{font-size:13px;color:var(--navy)}.dashboard-own-item span{font-size:13px;color:var(--muted)}
+
+
+/* MetaLink Logistique: clearer marketplace-first mobile experience */
+:root{--navy:#10263a;--blue:#176b87;--orange:#f59b25;--teal:#087f78;--paper:#f4f7f9;--line:#dce5eb}
+main{width:min(100%,900px);padding-top:18px}
+.welcome{position:relative;overflow:hidden;min-height:150px;margin:4px 0 16px;padding:25px 22px;border-radius:22px;background:linear-gradient(125deg,#10263a 0%,#174d68 68%,#087f78 100%);color:#fff;box-shadow:0 12px 28px #10263a20}
+.welcome:after{content:"";position:absolute;inset:auto -28px -78px auto;width:210px;height:210px;border:26px solid #ffffff12;border-radius:50%;pointer-events:none}
+.welcome-symbol{width:82px;height:82px;border-radius:23px;background:#ffffff18;color:#fff}
+.eyebrow{color:#80e0d2}
+h1{color:#fff}
+.welcome-copy{color:#e0edf2}
+.quick-actions{gap:12px;margin-bottom:18px}
+.quick-card{min-height:132px;border-radius:18px;padding:18px;border-width:1px;box-shadow:0 6px 18px #17384b0b}
+.quick-card strong{font-size:18px}
+.quick-card small{font-size:12px}
+.orange-card{background:#fff5e8;color:#713e06;border-color:#f4d7b0}
+.blue-card{background:#e8f3f8;color:#154c67;border-color:#c8e0eb}
+.teal-card{background:#e4f7f2;color:#075f5a;border-color:#c5e9df}
+.grey-card{background:#f0f3f6;color:#314957;border-color:#dce4e9}
+.panel{border-radius:19px;padding:20px;border-color:#e1e8ee;box-shadow:0 5px 22px #193b4b08}
+.section-title{margin-bottom:17px}
+.listing-filters{display:grid;gap:8px;margin:0 0 14px;padding:13px;border:1px solid #e1eaf0;border-radius:14px;background:#f8fbfc}
+.listing-search-label{font-size:13px;font-weight:800;color:#284452}
+.listing-filters input{background:#fff}
+.filter-chips{display:flex;gap:7px;flex-wrap:wrap}
+.filter-chip{min-height:40px;padding:8px 13px;border:1px solid #d4e1e7;border-radius:999px;background:#fff;color:#375463;font-size:13px;font-weight:800}
+.filter-chip.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.listing-card{border-radius:16px;padding:16px;box-shadow:0 3px 12px #193b4b06}
+.listing-actions a,.listing-actions button{min-height:46px;border-radius:11px}
+.account-card{background:#f8fafb;border-radius:15px}
+.sponsor-strip{display:none!important}
+footer{margin-top:12px}
+@media(min-width:700px){.welcome{padding:32px 30px}.quick-actions{grid-template-columns:repeat(4,minmax(0,1fr))}.quick-card{min-height:150px}.listing-filters{grid-template-columns:1fr;}}
+@media(max-width:420px){.welcome{padding:20px 15px;gap:12px}.welcome-symbol{width:62px;height:62px;font-size:35px}.quick-card{min-height:122px;padding:14px}.quick-card strong{font-size:16px}.panel{padding:14px}.filter-chip{font-size:12px;padding:8px 10px}}
