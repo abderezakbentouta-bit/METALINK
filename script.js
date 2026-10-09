@@ -225,6 +225,10 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
       const details = isCarrier ? data.cargo : data.details;
       if (details && details.trim()) infoParts.push(details.trim());
       if (!currentUser) {
+        if (button) {
+          button.disabled = false;
+          button.textContent = isCarrier ? 'Publier l’offre de transport →' : 'Publier ma demande →';
+        }
         status.hidden = false;
         status.textContent = 'Connectez-vous ou créez un compte dans la section Connexion avant de publier.';
         document.getElementById('auth')?.scrollIntoView({behavior:'smooth'});
