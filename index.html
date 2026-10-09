@@ -103,7 +103,7 @@
           <button id="authSubmit" class="primary-button" type="submit">دخول</button>
         </form>
         <button id="resetPassword" class="text-button" type="button">نسيت كلمة المرور؟</button>
-        <section id="driverProfileSection" class="driver-profile-section" hidden>
+        <div id="driverProfileModal" class="driver-profile-modal" hidden><section id="driverProfileSection" class="driver-profile-section">
           <div class="profile-heading"><span class="profile-avatar-icon">🪪</span><div><h3>ملف السائق</h3><p>أكمل بياناتك قبل نشر الشاحنة.</p></div></div>
           <form id="driverProfileForm" class="simple-form">
             <label>👤 الاسم الكامل<input id="driverFullName" name="fullName" autocomplete="name" required maxlength="100" placeholder="الاسم الحقيقي للسائق"></label>
@@ -116,7 +116,8 @@
             <button id="saveDriverProfile" class="primary-button" type="submit">💾 حفظ ملف السائق</button>
             <p id="driverProfileStatus" class="status-message" role="status"></p>
           </form>
-        </section>
+        </section></div>
+        <button id="editDriverProfile" class="secondary-button" type="button" hidden>🪪 تعديل بيانات السائق</button>
         <button id="signOutButton" class="danger-button" type="button" hidden>خروج من الحساب</button>
         <p id="authStatus" class="status-message" role="status">لم تسجل الدخول بعد.</p>
       </div>
