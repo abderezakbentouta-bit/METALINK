@@ -224,6 +224,7 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
       infoParts.push(`${isCarrier ? 'Prix souhaité' : 'Budget indicatif'} : ${price ? `${Number(price).toLocaleString('fr-FR')} DA` : 'À négocier'}`);
       const details = isCarrier ? data.cargo : data.details;
       if (details && details.trim()) infoParts.push(details.trim());
+      const button = form.querySelector('button[type="submit"]');
       if (!currentUser) {
         if (button) {
           button.disabled = false;
@@ -245,7 +246,6 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
         telephone: data.phone.trim(),
         informations: infoParts.join(' | ')
       };
-      const button = form.querySelector('button[type="submit"]');
       if (button) { button.disabled = true; button.textContent = 'Publication en cours…'; }
       status.hidden = false;
       status.textContent = 'Envoi de votre annonce…';
@@ -264,4 +264,39 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
   submitToDatabase(carrierForm, 'carrier');
   submitToDatabase(shipperForm, 'shipper');
   loadListings();
+})();
+
+/* Demonstration-only chat and advertising brief. No messages or ad requests are transmitted. */
+(() => {
+  const chatForm = document.getElementById('chatDemoForm');
+  const chatInput = document.getElementById('chatDemoInput');
+  const chatMessages = document.getElementById('driverChatMessages');
+  const chatStatus = document.getElementById('chatDemoStatus');
+  chatForm?.addEventListener('submit', event => {
+    event.preventDefault();
+    const value = chatInput?.value.trim();
+    if (!value || !chatMessages) return;
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-message driver demo-local-message';
+    const label = document.createElement('small');
+    label.textContent = 'Votre message · aperçu local';
+    const paragraph = document.createElement('p');
+    paragraph.textContent = value;
+    const time = document.createElement('time');
+    time.textContent = 'Non envoyé · non enregistré';
+    bubble.append(label, paragraph, time);
+    chatMessages.appendChild(bubble);
+    chatInput.value = '';
+    chatStatus.textContent = 'Message ajouté à l’aperçu sur cet appareil uniquement. Il n’a pas été envoyé à Hamid ni à Ultra Fer.';
+    bubble.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  const adForm = document.getElementById('adRequestForm');
+  const adStatus = document.getElementById('adRequestStatus');
+  adForm?.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!adForm.reportValidity()) return;
+    const data = new FormData(adForm);
+    adStatus.textContent = 'Brief préparé pour ' + String(data.get('company') || 'votre entreprise') + ' (' + String(data.get('style') || 'style à définir') + '). Rien n’a été envoyé ni enregistré : la table sécurisée des demandes publicitaires doit être créée avant activation.';
+    adStatus.classList.add('prepared');
+  });
 })();
