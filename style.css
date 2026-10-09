@@ -108,3 +108,32 @@ footer .brand-icon{width:30px;height:30px;font-size:16px;border-radius:9px}
 footer small{width:100%;font-size:11px;color:#b8cbd5}
 @media(min-width:600px){main{padding:22px 18px 45px}.quick-card{min-height:142px;padding:20px}.panel{padding:22px}.simple-form{grid-template-columns:1fr 1fr;gap:14px}.simple-form label,.simple-form .primary-button,.simple-form .status-message{min-width:0}.simple-form .primary-button,.simple-form>.status-message{grid-column:1/-1}.simple-form .voice-field{min-width:0}.account-card .simple-form{grid-template-columns:1fr}.details-form{grid-template-columns:1fr 1fr}.details-form label:nth-last-of-type(2),.details-form .primary-button{grid-column:1/-1}}
 @media(max-width:360px){main{padding:10px 8px 28px}.panel{padding:12px}.quick-card{min-height:114px;padding:12px}.quick-card strong{font-size:15px}.quick-card small{font-size:10px}.welcome{padding:14px 7px}.welcome-symbol{width:61px;height:61px;font-size:34px}.account-label{display:none}.section-title{gap:8px}.section-title h2{font-size:17px}}
+
+
+/* Sponsored business strips: compact, responsive and separate from transport listings */
+.sponsor-strip{margin:14px 0 18px;display:grid;gap:9px}
+.sponsor-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 3px;color:var(--navy);font-weight:900;font-size:14px}
+.sponsor-heading small{font-size:11px;color:var(--muted);font-weight:600}
+.sponsor-card{display:grid;grid-template-columns:minmax(100px,34%) minmax(0,1fr);overflow:hidden;border:1px solid var(--line);border-radius:15px;background:#fff;box-shadow:0 3px 13px #193b4b08;min-width:0}
+.sponsor-visual{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center}
+.tirsam-visual{background:linear-gradient(145deg,#102b3f,#1f5b78);color:#fff}
+.sponsor-symbol{display:grid;place-items:center;width:44px;height:44px;border:2px solid #f28a21;border-radius:12px;color:#fff;font-weight:1000;font-size:28px;font-style:italic}
+.truck-art{font-size:45px;filter:drop-shadow(0 4px 3px #0003)}
+.steel-visual{background:linear-gradient(145deg,#263b4a,#657985);color:white;position:relative}
+.steel-logo{font-size:28px;font-weight:1000;letter-spacing:-1.5px;border:2px solid #dbe6eb;padding:4px 8px;transform:skew(-7deg)}
+.steel-logo span{color:#ffb24a}
+.steel-bars{display:flex;align-items:end;justify-content:center;gap:5px;height:39px;transform:skew(-15deg)}
+.steel-bars i{display:block;width:9px;height:100%;border:2px solid #cbd8df;background:linear-gradient(90deg,#536a78,#b9c6cc,#657985)}
+.steel-bars i:nth-child(2){height:78%}.steel-bars i:nth-child(3){height:90%}.steel-bars i:nth-child(4){height:68%}.steel-bars i:nth-child(5){height:84%}
+.sponsor-info{padding:12px;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.sponsor-tag{font-size:10px;font-weight:850;color:var(--teal);background:#e6f5f2;border-radius:20px;padding:3px 7px}
+.sponsor-info h2{font-size:17px;overflow-wrap:anywhere}
+.sponsor-info p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.sponsor-phones{display:grid;gap:3px;margin:2px 0}
+.sponsor-phones a{font-size:13px;font-weight:850;color:var(--navy);direction:ltr;text-align:right;overflow-wrap:anywhere}
+.sponsor-cta{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 10px;border-radius:9px;background:var(--orange);color:#172b38;font-size:12px;font-weight:900;margin-top:auto}
+.sponsor-note{font-size:11px;color:var(--muted);margin:0;padding:0 3px}
+.sponsor-top{margin-top:10px}
+.sponsor-bottom{margin-top:20px}
+@media(min-width:600px){.sponsor-card{grid-template-columns:170px minmax(0,1fr)}.sponsor-visual{min-height:170px}.sponsor-info{padding:16px}.sponsor-info h2{font-size:19px}}
+@media(max-width:360px){.sponsor-card{grid-template-columns:96px minmax(0,1fr)}.sponsor-visual{padding:7px}.truck-art{font-size:36px}.sponsor-info{padding:9px}.sponsor-info h2{font-size:15px}.sponsor-phones a{font-size:12px}}
