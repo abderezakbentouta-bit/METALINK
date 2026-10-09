@@ -346,10 +346,10 @@
   // Transport listings use the existing annonces table and current RLS rules.
   function renderListing(row) {
     const carrier = row.type_annonce === 'offre_transport';
-    const title = carrier ? 'شاحنة متاحة' : 'طلب نقل';
+    const title = carrier ? 'شاحنة متاحة' : 'طلب شاحنة';
     const subtitle = carrier
       ? (row.type_camion || 'نوع الشاحنة غير محدد') + ' · ' + (row.quantite_tonnes ?? '—') + ' طن'
-      : (row.marchandise || 'البضاعة غير محددة') + ' · ' + (row.quantite_tonnes ?? '—') + ' طن';
+      : (row.type_camion || 'أي شاحنة مناسبة') + ' · ' + (row.marchandise || 'البضاعة غير محددة') + ' · ' + (row.quantite_tonnes ?? '—') + ' طن';
     const info = String(row.informations || '');
     const dateMatch = info.match(/Date : ([^|]+)/);
     const priceMatch = info.match(/(?:Prix souhaité|Budget indicatif) : ([^|]+)/);
@@ -417,6 +417,10 @@
       }
       const values = Object.fromEntries(new FormData(form).entries());
       const carrier = type === 'carrier';
+      if (carrier && (currentUser.user_metadata?.account_type || 'driver') !== 'driver') {
+        showStatus($('logisticsStatus'), 'نشر الشاحنة مخصص لحساب السائق. إذا كنت تبحث عن نقل، اختر «أبحث عن شاحنة».', 'error');
+        return;
+      }
       if (carrier) {
         const profile = readDriverProfile();
         if (!profile.fullName || !profile.plate || !profile.residence || !profile.phone || !profile.photoUrl) {
@@ -436,6 +440,7 @@
         (carrier ? 'Prix souhaité' : 'Budget indicatif') + ' : ' + (values[carrier ? 'price' : 'budget'] ? Number(values[carrier ? 'price' : 'budget']).toLocaleString('fr-FR') + ' DA' : 'À négocier')
       ];
       const details = carrier ? values.cargo : values.details;
+      if (!carrier && values.truckType) info.push('Type de camion recherché : ' + values.truckType);
       if (details?.trim()) info.push(details.trim());
       if (carrier) info.push('PROFILE_JSON:' + JSON.stringify(readDriverProfile()));
       const row = {
@@ -445,7 +450,7 @@
         ville_arrivee: values.destination.trim(),
         marchandise: carrier ? (values.cargo?.trim() || 'À préciser') : values.cargoType,
         quantite_tonnes: Number(carrier ? values.capacity : values.weight),
-        type_camion: carrier ? values.vehicle : null,
+        type_camion: carrier ? values.vehicle : (values.truckType || null),
         telephone: carrier ? readDriverProfile().phone : values.phone.trim(),
         informations: info.join(' | ')
       };
