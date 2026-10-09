@@ -1,1 +1,100 @@
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MetaLink Logistique</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2f4f7;color:#202b38}
+header{background:#173653;color:white;padding:22px 16px;text-align:center}
+header h1{margin:0;color:#f2bd52;font-size:27px}
+header p{margin:8px 0 0}
+main{max-width:650px;margin:auto;padding:16px}
+.card{background:white;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 12px #0000000c}
+h2{font-size:19px;margin-top:0;color:#173653}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ccd3dc;border-radius:8px;font-size:16px;background:white}
+button{width:100%;padding:13px;border:0;border-radius:8px;background:#e6ad3e;color:#173653;font-size:16px;font-weight:bold;margin-top:14px}
+.choice{display:flex;gap:8px}
+.choice button{background:#173653;color:white}
+.listing{border-left:4px solid #e6ad3e;padding:12px;margin-top:12px;background:#f7f8fa;border-radius:5px;overflow-wrap:anywhere}
+footer{text-align:center;padding:20px;color:#657080;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>MetaLink Logistique</h1>
+<p>La plateforme du transport de l'acier en Algérie</p>
+</header>
+<main>
+<div class="card">
+<h2>Bienvenue sur MetaLink</h2>
+<p>Connectons les transporteurs et les clients du secteur de l'acier.</p>
+<div class="choice">
+<button onclick="showForm('transport')">🚛 Transporteur</button>
+<button onclick="showForm('client')">🏗️ Client</button>
+</div>
+</div>
+<div class="card" id="formCard">
+<h2>Publier une annonce</h2>
+<label>Type d'annonce</label>
+<select id="type">
+<option value="transport">Camion disponible / Retour à vide</option>
+<option value="client">Demande de transport de fer</option>
+</select>
+<label>Ville de départ</label>
+<input id="depart" placeholder="Ex : Alger">
+<label>Ville d'arrivée</label>
+<input id="arrivee" placeholder="Ex : Oran">
+<label>Marchandise / Type de camion</label>
+<input id="marchandise" placeholder="Ex : IPE, HEA, tôles, camion plateau">
+<label>Quantité ou capacité (tonnes)</label>
+<input id="quantite" type="number" min="0" placeholder="Ex : 20">
+<label>Téléphone</label>
+<input id="telephone" type="tel" placeholder="Numéro de téléphone">
+<label>Informations complémentaires</label>
+<textarea id="details" rows="3" placeholder="Date, prix indicatif, dimensions..."></textarea>
+<button onclick="publier()">Publier l'annonce</button>
+</div>
+<div class="card">
+<h2>Dernières annonces</h2>
+<div id="annonces"><p>Aucune annonce publiée pour le moment.</p></div>
+</div>
+</main>
+<footer>MetaLink Logistique · Transport de l'acier en Algérie</footer>
+<script>
+function showForm(type){
+document.getElementById('type').value=type;
+document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+}
+function publier(){
+const type=document.getElementById('type').value;
+const depart=document.getElementById('depart').value.trim();
+const arrivee=document.getElementById('arrivee').value.trim();
+const marchandise=document.getElementById('marchandise').value.trim();
+const quantite=document.getElementById('quantite').value;
+const telephone=document.getElementById('telephone').value.trim();
+const details=document.getElementById('details').value.trim();
+if(!depart||!arrivee||!telephone){
+alert('Veuillez remplir les villes et le téléphone.');
+return;
+}
+const annonce=document.createElement('div');
+annonce.className='listing';
+const titre=document.createElement('strong');
+titre.textContent=type==='transport'?'🚛 Offre de transport':'🏗️ Demande de transport';
+annonce.appendChild(titre);
+[[depart+' → '+arrivee],[marchandise||'Marchandise non précisée'],[quantite?quantite+' tonnes':'Quantité non précisée'],['Téléphone : '+telephone],[details]].forEach(function(item){
+const p=document.createElement('p');
+p.textContent=item[0];
+annonce.appendChild(p);
+});
+document.getElementById('annonces').prepend(annonce);
+document.getElementById('type').value='transport';
+['depart','arrivee','marchandise','quantite','telephone','details'].forEach(id=>document.getElementById(id).value='');
+alert('Annonce ajoutée à cette page.');
+}
+</script>
+</body>
+</html>
