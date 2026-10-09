@@ -490,6 +490,26 @@
   db.auth.onAuthStateChange((_event, session) => updateAuthUI(session?.user || null));
   loadListings();
 
+  // Native install prompt when supported by the browser.
+  let deferredInstallPrompt = null;
+  const installButton = $('installApp');
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    if (installButton) installButton.hidden = false;
+  });
+  installButton?.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) {
+      showStatus($('authStatus'), 'إذا لم يظهر التثبيت هنا، افتح قائمة المتصفح ثم اختر «إضافة إلى الشاشة الرئيسية».');
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+  });
+  window.addEventListener('appinstalled', () => { if (installButton) installButton.hidden = true; });
+
   // Register the installable-app service worker on HTTPS hosts such as GitHub Pages.
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
