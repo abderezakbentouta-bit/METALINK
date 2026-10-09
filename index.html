@@ -36,17 +36,17 @@
     </section>
 
     <nav class="quick-actions" aria-label="الخدمات الرئيسية">
-      <a class="quick-card orange-card" href="#publish"><span class="quick-icon" aria-hidden="true">📦</span><strong>أبحث عن حمولة</strong><small>Je cherche un chargement</small></a>
+      <a class="quick-card orange-card" href="#publish"><span class="quick-icon" aria-hidden="true">🔎</span><strong>أبحث عن شاحنة</strong><small>Je cherche un camion</small></a>
       <a class="quick-card blue-card" href="#publish"><span class="quick-icon" aria-hidden="true">🚛</span><strong>لدي شاحنة</strong><small>J’ai un camion disponible</small></a>
       <a class="quick-card teal-card" href="#messages"><span class="quick-icon" aria-hidden="true">💬</span><strong>رسائلي</strong><small>Mes discussions</small></a>
       <a class="quick-card grey-card" href="#account"><span class="quick-icon" aria-hidden="true">👤</span><strong>حسابي</strong><small>Connexion / Déconnexion</small></a>
     </nav>
 
     <section class="panel" id="publish">
-      <div class="section-title"><span class="title-icon">🛣️</span><div><h2>النقل والحمولات</h2><p>Publiez une offre ou trouvez un transport.</p></div></div>
+      <div class="section-title"><span class="title-icon">🛣️</span><div><h2>النقل والحمولات</h2><p>Je cherche un camion ou je propose mon camion.</p></div></div>
       <div class="switcher" role="tablist" aria-label="نوع الطلب">
-        <button class="switch active" type="button" data-panel="carrierPanel" role="tab" aria-selected="true">🚛 لدي شاحنة</button>
-        <button class="switch" type="button" data-panel="shipperPanel" role="tab" aria-selected="false">📦 أبحث عن نقل</button>
+        <button class="switch active" type="button" data-panel="carrierPanel" role="tab" aria-selected="true">🚛 لدي شاحنة — Je propose un camion</button>
+        <button class="switch" type="button" data-panel="shipperPanel" role="tab" aria-selected="false">🔎 أبحث عن شاحنة — Je cherche un camion</button>
       </div>
       <div class="form-panel active" id="carrierPanel">
         <form id="carrierForm" class="simple-form">
@@ -58,20 +58,21 @@
           <label>📞 رقم الهاتف<input name="phone" id="carrierPhone" type="tel" inputmode="tel" required placeholder="رقم الهاتف"></label>
           <label>📦 نوع الحمولة (اختياري)<div class="voice-field"><input name="cargo" id="carrierCargo" placeholder="حديد، أنابيب، أي حمولة"><button class="voice-button" type="button" data-voice-for="carrierCargo" aria-label="املأ بالصوت">🎙️</button></div></label>
           <label>💰 السعر بالدينار (اختياري)<input name="price" type="number" min="0" placeholder="اتفاق بين الطرفين"></label>
-          <button class="primary-button submit-button" type="submit">✅ نشر الشاحنة</button>
+          <button class="primary-button submit-button" type="submit">🚛 نشر شاحنتي / Publier mon camion</button>
         </form>
       </div>
       <div class="form-panel" id="shipperPanel">
         <form id="shipperForm" class="simple-form">
-          <label>📍 مكان التحميل <div class="voice-field"><input name="origin" id="shipperOrigin" required placeholder="مثال: سطيف"><button class="voice-button" type="button" data-voice-for="shipperOrigin" aria-label="املأ بالصوت">🎙️</button></div></label>
-          <label>📍 مكان التسليم <div class="voice-field"><input name="destination" id="shipperDestination" required placeholder="مثال: وهران"><button class="voice-button" type="button" data-voice-for="shipperDestination" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>📍 مكان التحميل <div class="voice-field"><input name="origin" id="shipperOrigin" required placeholder="مثال: Blida"><button class="voice-button" type="button" data-voice-for="shipperOrigin" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>📍 مكان التسليم <div class="voice-field"><input name="destination" id="shipperDestination" required placeholder="مثال: Oran"><button class="voice-button" type="button" data-voice-for="shipperDestination" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>🚛 نوع الشاحنة المطلوبة<select name="truckType" required><option value="">اختر نوع الشاحنة</option><option>شاحنة مسطحة للحديد / plateau</option><option>نصف مقطورة / semi-remorque</option><option>شاحنة مغطاة</option><option>شاحنة صغيرة</option><option>أي نوع مناسب</option></select></label>
           <label>📦 نوع البضاعة<select name="cargoType" required><option value="">اختر نوع البضاعة</option><option>حديد IPE / HEA / HEB</option><option>أنابيب حديدية</option><option>صفائح حديدية</option><option>حديد دائري أو مربع</option><option>مواد أخرى</option></select></label>
           <label>⚖️ الوزن بالطن<input name="weight" type="number" min="0.1" step="0.1" required placeholder="مثال: 18"></label>
           <label>📅 تاريخ النقل<input name="date" type="date" required></label>
           <label>📞 رقم الهاتف<input name="phone" id="shipperPhone" type="tel" inputmode="tel" required placeholder="رقم الهاتف"></label>
-          <label>📝 تفاصيل (اختياري)<div class="voice-field"><input name="details" id="shipperDetails" placeholder="تفاصيل إضافية"><button class="voice-button" type="button" data-voice-for="shipperDetails" aria-label="املأ بالصوت">🎙️</button></div></label>
+          <label>📝 تفاصيل (اختياري)<div class="voice-field"><input name="details" id="shipperDetails" placeholder="مثال: retour Oran-Blida, 20 000 DA"><button class="voice-button" type="button" data-voice-for="shipperDetails" aria-label="املأ بالصوت">🎙️</button></div></label>
           <label>💰 الميزانية بالدينار (اختياري)<input name="budget" type="number" min="0" placeholder="قابلة للتفاوض"></label>
-          <button class="primary-button submit-button" type="submit">✅ نشر طلب النقل</button>
+          <button class="primary-button submit-button" type="submit">🔎 البحث عن شاحنة / Publier ma demande</button>
         </form>
       </div>
       <p id="logisticsStatus" class="status-message" role="status" hidden></p>
