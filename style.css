@@ -176,3 +176,5 @@ footer small{width:100%;font-size:11px;color:#b8cbd5}
 
 .brand-icon-image{display:block;width:48px;height:48px;flex:0 0 48px;object-fit:contain;border-radius:12px}
 .footer-brand-image{width:36px;height:36px;flex-basis:36px}
+
+.switcher .switch{line-height:1.45;min-height:48px}
