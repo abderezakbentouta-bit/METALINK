@@ -103,6 +103,20 @@
           <button id="authSubmit" class="primary-button" type="submit">دخول</button>
         </form>
         <button id="resetPassword" class="text-button" type="button">نسيت كلمة المرور؟</button>
+        <section id="driverProfileSection" class="driver-profile-section" hidden>
+          <div class="profile-heading"><span class="profile-avatar-icon">🪪</span><div><h3>ملف السائق</h3><p>أكمل بياناتك قبل نشر الشاحنة.</p></div></div>
+          <form id="driverProfileForm" class="simple-form">
+            <label>👤 الاسم الكامل<input id="driverFullName" name="fullName" autocomplete="name" required maxlength="100" placeholder="الاسم الحقيقي للسائق"></label>
+            <label>🚛 ترقيم الشاحنة<input id="driverPlate" name="plate" required maxlength="30" placeholder="رقم لوحة التسجيل" dir="auto"></label>
+            <label>📍 مكان الإقامة (الولاية والمدينة)<input id="driverResidence" name="residence" required maxlength="120" placeholder="مثال: البليدة، بني مراد"></label>
+            <label>📞 رقم الهاتف<input id="driverPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="30" placeholder="رقم الاتصال"></label>
+            <label>📸 صورة السائق<input id="driverPhoto" name="photo" type="file" accept="image/jpeg,image/png,image/webp" capture="user"></label>
+            <img id="driverPhotoPreview" class="driver-photo-preview" alt="معاينة صورة السائق" hidden>
+            <p class="profile-photo-note">صورة واضحة بصيغة JPG أو PNG أو WebP، بحجم لا يتجاوز 2 ميغابايت.</p>
+            <button id="saveDriverProfile" class="primary-button" type="submit">💾 حفظ ملف السائق</button>
+            <p id="driverProfileStatus" class="status-message" role="status"></p>
+          </form>
+        </section>
         <button id="signOutButton" class="danger-button" type="button" hidden>خروج من الحساب</button>
         <p id="authStatus" class="status-message" role="status">لم تسجل الدخول بعد.</p>
       </div>
