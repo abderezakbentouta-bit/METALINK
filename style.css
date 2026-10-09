@@ -173,3 +173,6 @@ footer small{width:100%;font-size:11px;color:#b8cbd5}
 .signup-fields[hidden]{display:none!important}
 .signup-fields label{display:grid;gap:6px;font-weight:750}
 .signup-fields input,.signup-fields select{width:100%;min-height:46px;padding:10px;border:1px solid #cbd8df;border-radius:10px;background:#fff;color:#183548;font:inherit}
+
+.brand-icon-image{display:block;width:48px;height:48px;flex:0 0 48px;object-fit:contain;border-radius:12px}
+.footer-brand-image{width:36px;height:36px;flex-basis:36px}
