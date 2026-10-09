@@ -697,38 +697,7 @@
     }
   });
 
-  // Advertising requests remain available, but do not distract from the transport workflow.
-  $('adRequestForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const form = $('adRequestForm');
-    if (!form.reportValidity()) return;
-    if (!currentUser) {
-      showStatus($('adRequestStatus'), 'سجّل الدخول أولًا لإرسال طلب الإشهار.', 'error');
-      $('account').scrollIntoView({behavior:'smooth'});
-      return;
-    }
-    const values = Object.fromEntries(new FormData(form).entries());
-    const button = form.querySelector('button[type="submit"]');
-    button.disabled = true;
-    try {
-      const {error} = await db.from('ad_requests').insert({
-        user_id: currentUser.id,
-        company_name: String(values.company || '').trim(),
-        ad_type: String(values.adType || '').trim(),
-        requested_style: String(values.style || '').trim(),
-        brief: String(values.brief || '').trim(),
-        contact_details: String(values.contact || '').trim(),
-        status: 'pending'
-      });
-      if (error) throw error;
-      showStatus($('adRequestStatus'), 'تم حفظ طلب الإشهار بنجاح، وهو الآن قيد المراجعة.', 'success');
-      form.reset();
-    } catch (error) {
-      showStatus($('adRequestStatus'), 'تعذر حفظ طلب الإشهار: ' + (error?.message || 'خطأ غير معروف'), 'error');
-    } finally {
-      button.disabled = false;
-    }
-  });
+  // Advertising is managed by the MetaLink admin; users cannot submit ads from the app.
 
   $('refreshListings').addEventListener('click', loadListings);
   db.auth.getSession().then(({data, error}) => {
