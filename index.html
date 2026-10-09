@@ -135,6 +135,49 @@
 <section class="cta" id="fournisseurs"><div><p class="eyebrow">VOUS ÊTES FOURNISSEUR OU ACHETEUR ?</p><h2>Le prochain projet commence par une connexion.</h2><p>Préparez votre présence sur une plateforme dédiée aux professionnels du métal.</p></div><a class="btn" href="#contact">Découvrir MetaLink <span>→</span></a></section>
 
 
+
+<section class="section driver-chat-section" id="chauffeur-chat">
+  <div class="section-heading">
+    <div><p class="eyebrow orange">ÉCHANGE TRANSPORTEUR · CLIENT</p><h2>Discussion transport retour</h2><p>Exemple de discussion entre Hamid, chauffeur, et Ultra Fer, client professionnel.</p></div>
+    <span class="demo-tag">APERÇU DE DÉMONSTRATION</span>
+  </div>
+  <div class="driver-chat-card">
+    <div class="driver-chat-header"><div class="driver-avatar">H</div><div><strong>Hamid · Chauffeur</strong><small>Trajet retour · Annaba → Blida</small></div><span class="chat-online">Exemple</span></div>
+    <div class="driver-chat-route"><span>ANNABA</span><span>→</span><span>BLIDA</span><small>Camion plateau · capacité indicative 20 t</small></div>
+    <div class="driver-chat-messages" id="driverChatMessages" aria-live="polite">
+      <div class="chat-message client"><small>Ultra Fer · Client</small><p>Bonjour Hamid, votre camion sera-t-il disponible pour un transport retour vers Blida ? Nous avons des poutrelles IPE.</p><time>Exemple de message</time></div>
+      <div class="chat-message driver"><small>Hamid · Chauffeur</small><p>Bonjour ! Je peux étudier le chargement. Quel est le tonnage, la longueur des poutrelles et l’adresse de chargement ?</p><time>Exemple de message</time></div>
+      <div class="chat-message client"><small>Ultra Fer · Client</small><p>Environ 18 tonnes. Pouvez-vous confirmer le prix, l’horaire et les conditions de chargement avant de réserver ?</p><time>Exemple de message</time></div>
+      <div class="chat-message driver"><small>Hamid · Chauffeur</small><p>Bien reçu. Je confirme la disponibilité et le tarif après vérification. Ne considérons le transport comme réservé qu’après accord des deux côtés.</p><time>Exemple de message</time></div>
+    </div>
+    <form class="chat-demo-composer" id="chatDemoForm"><label for="chatDemoInput">Tester l’aperçu de discussion</label><div><input id="chatDemoInput" maxlength="400" placeholder="Écrire un message de démonstration…" required><button class="btn" type="submit">Envoyer ↗</button></div><p id="chatDemoStatus" aria-live="polite">Simulation uniquement : les messages de cet aperçu ne sont pas envoyés ni enregistrés.</p></form>
+  </div>
+</section>
+
+<section class="section ad-request-section" id="publicite">
+  <div class="section-heading">
+    <div><p class="eyebrow orange">PUBLICITÉ PROFESSIONNELLE</p><h2>Demander une publicité MetaLink</h2><p>Une entreprise peut demander une campagne pour ses camions, ses produits ou ses services.</p></div>
+    <span class="demo-tag">EXEMPLE DE BRIEF</span>
+  </div>
+  <div class="ad-request-layout">
+    <div class="ad-showcase">
+      <div class="ad-showcase-top"><span class="ad-sponsored">EXEMPLE · PUBLICITÉ</span><span class="ad-company-mark">T</span></div>
+      <div class="ad-truck-art" role="img" aria-label="Illustration de camion de transport pour un exemple de publicité"></div>
+      <div class="ad-showcase-copy"><p class="eyebrow orange">CAMPAGNE CAMION · EXEMPLE FICTIF</p><h3>Votre flotte, visible auprès des professionnels.</h3><p>Visuel de camion, itinéraires, capacité et coordonnées commerciales — à valider par l’entreprise avant publication.</p><span class="ad-style-chip">Style transport</span><span class="ad-style-chip">Style anticorrosion</span></div>
+    </div>
+    <form class="ad-request-form" id="adRequestForm">
+      <h3>Brief de publicité</h3><p>Exemple de demande pour une entreprise telle que Tirsam. Ce formulaire n’est pas encore relié à l’enregistrement des demandes.</p>
+      <label>Nom de l’entreprise<input name="company" required placeholder="Ex. Tirsam"></label>
+      <label>Type de publicité<select name="adType" required><option value="">Choisir une campagne</option><option>Camions et flotte de transport</option><option>Produits métalliques</option><option>Construction métallique</option><option>Service anticorrosion</option><option>Autre</option></select></label>
+      <label>Style souhaité<select name="style" required><option value="">Choisir un style</option><option>Style transport moderne</option><option>Style industriel / acier</option><option>Style anticorrosion</option><option>Un autre style svp</option></select></label>
+      <label>Votre demande<textarea name="brief" rows="3" required placeholder="Ex. publicité pour nos camions, couleurs, texte et coordonnées à afficher…"></textarea></label>
+      <label>Téléphone ou e-mail professionnel<input name="contact" required placeholder="Coordonnées de contact"></label>
+      <button class="btn" type="submit">Préparer le brief publicitaire ↗</button>
+      <p id="adRequestStatus" class="ad-form-status" aria-live="polite">Le brief peut être préparé ici, mais il ne sera pas transmis tant que le stockage sécurisé n’est pas activé.</p>
+    </form>
+  </div>
+</section>
+
 <section class="section auth-section" id="auth">
   <div class="auth-intro"><p class="eyebrow orange">ESPACE PROFESSIONNEL</p><h2>Connexion à MetaLink</h2><p>Connectez-vous pour publier une offre de transport ou une demande. Les annonces sont associées à votre compte.</p></div>
   <div class="auth-card">
