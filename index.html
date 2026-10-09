@@ -35,6 +35,18 @@
       <div><p class="eyebrow">النقل أسهل مع MetaLink</p><h1>ماذا تريد اليوم؟</h1><p class="welcome-copy">اختر زرًا كبيرًا للمتابعة.</p></div>
     </section>
 
+
+    <section class="panel dashboard-panel" id="dashboard">
+      <div class="section-title"><span class="title-icon">📊</span><div><h2>لوحة التحكم</h2><p>Tableau de bord · ملخص حسابك ونشاطك.</p></div></div>
+      <div id="dashboardGuest" class="dashboard-guest"><p>سجّل الدخول لمشاهدة لوحة التحكم الخاصة بك.</p><a class="primary-button dashboard-cta" href="#account">دخول / إنشاء حساب</a></div>
+      <div id="dashboardContent" hidden>
+        <div class="dashboard-welcome"><span class="dashboard-avatar">👤</span><div><strong id="dashboardName">مرحبًا بك</strong><small id="dashboardRole">نوع الحساب</small><small id="dashboardLocation">الولاية والبلدية</small></div></div>
+        <div class="dashboard-stats"><div class="dashboard-stat"><strong id="dashboardTotal">0</strong><span>إعلاناتي</span></div><div class="dashboard-stat"><strong id="dashboardOffers">0</strong><span>عروض الشاحنات</span></div><div class="dashboard-stat"><strong id="dashboardRequests">0</strong><span>طلبات النقل</span></div></div>
+        <div class="dashboard-actions"><a href="#publish" id="dashboardPublish">➕ نشر إعلان</a><a href="#loads">🔎 مشاهدة العروض</a><a href="#messages">💬 رسائلي</a><a href="#account">⚙️ بيانات الحساب</a></div>
+        <div class="dashboard-own"><h3>آخر إعلاناتي</h3><div id="dashboardOwnListings" class="dashboard-own-list"><p class="empty-state">لا توجد إعلانات منشورة بعد.</p></div></div>
+      </div>
+    </section>
+
     <nav class="quick-actions" aria-label="الخدمات الرئيسية">
       <a class="quick-card orange-card" href="#publish"><span class="quick-icon" aria-hidden="true">🔎</span><strong>أبحث عن شاحنة</strong><small>Je cherche un camion</small></a>
       <a class="quick-card blue-card" href="#publish"><span class="quick-icon" aria-hidden="true">🚛</span><strong>لدي شاحنة</strong><small>J’ai un camion disponible</small></a>
