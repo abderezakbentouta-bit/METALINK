@@ -168,3 +168,8 @@ footer small{width:100%;font-size:11px;color:#b8cbd5}
 .driver-profile-modal .profile-heading{position:sticky;top:-18px;z-index:1;padding:5px 0 12px;background:#fff}
 .secondary-button{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:10px;padding:10px;border:1px solid #cbd9df;border-radius:12px;background:#edf4f6;color:#173e52;font-weight:850}
 @media(max-height:650px){.driver-profile-modal{align-items:flex-start}.driver-profile-modal .driver-profile-section{max-height:none}}
+
+.signup-fields{display:grid;gap:12px;padding:14px;margin-bottom:12px;border:1px solid #d9e3e8;border-radius:14px;background:#f6fafc}
+.signup-fields[hidden]{display:none!important}
+.signup-fields label{display:grid;gap:6px;font-weight:750}
+.signup-fields input,.signup-fields select{width:100%;min-height:46px;padding:10px;border:1px solid #cbd8df;border-radius:10px;background:#fff;color:#183548;font:inherit}
