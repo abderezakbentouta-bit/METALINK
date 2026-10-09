@@ -18,6 +18,23 @@
     element.hidden = !message;
   };
 
+  function friendlyAuthError(error) {
+    const message = String(error?.message || '').toLowerCase();
+    if (message.includes('rate limit') || error?.status === 429) {
+      return 'وصلنا إلى حدّ إرسال رسائل التأكيد في Supabase. لا تعاود المحاولة عدة مرات؛ انتظر قليلًا ثم جرّب مرة واحدة، أو راجع إعدادات Auth والبريد في Supabase.';
+    }
+    if (message.includes('invalid login credentials')) {
+      return 'البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقق منهما أو استخدم «نسيت كلمة المرور».';
+    }
+    if (message.includes('email not confirmed')) {
+      return 'يجب تأكيد بريدك الإلكتروني من الرسالة التي وصلتك قبل الدخول.';
+    }
+    if (message.includes('password should be at least')) {
+      return 'كلمة المرور قصيرة جدًا. استخدم كلمة مرور أطول.';
+    }
+    return error?.message || 'حدث خطأ غير معروف. حاول لاحقًا.';
+  }
+
   if (!window.supabase) {
     showStatus($('logisticsStatus'), 'تعذر تحميل خدمة الاتصال. تحقق من الإنترنت ثم حدّث الصفحة.', 'error');
     return;
@@ -303,7 +320,7 @@
         updateAuthUI(data.user);
       }
     } catch (error) {
-      showStatus($('authStatus'), 'تعذر الدخول: ' + (error?.message || 'خطأ غير معروف'), 'error');
+      showStatus($('authStatus'), friendlyAuthError(error), 'error');
     } finally {
       button.disabled = false;
       if (!currentUser) button.textContent = authMode === 'signup' ? 'إنشاء حساب' : 'دخول';
@@ -585,9 +602,12 @@
       );
       if (!conversation) {
         const context = 'نقل: ' + (listing.ville_depart || '؟') + ' → ' + (listing.ville_arrivee || '؟');
+        // The SQL migration requires participant_one < participant_two.
+        // Sort UUIDs before insert so either side can initiate the conversation.
+        const [participantOne, participantTwo] = [currentUser.id, listing.user_id].sort();
         const {data, error} = await db.from('chat_conversations').insert({
-          participant_one: currentUser.id,
-          participant_two: listing.user_id,
+          participant_one: participantOne,
+          participant_two: participantTwo,
           created_by: currentUser.id,
           context
         }).select('*').single();
