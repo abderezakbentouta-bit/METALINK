@@ -1,18 +1,23 @@
 package dz.metalink.logistique
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.webkit.WebSettings
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.CookieManager
-import android.app.Activity
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+    private val fileChooserRequestCode = 4201
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,13 +34,52 @@ class MainActivity : Activity() {
         webView.settings.allowFileAccess = false
         webView.settings.javaScriptCanOpenWindowsAutomatically = false
         webView.webViewClient = WebViewClient()
-        webView.webChromeClient = WebChromeClient()
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                view: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                this@MainActivity.fileChooserCallback?.onReceiveValue(null)
+                this@MainActivity.fileChooserCallback = filePathCallback
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "image/*"
+                }
+                return try {
+                    startActivityForResult(
+                        Intent.createChooser(intent, "اختر صورة السائق"),
+                        fileChooserRequestCode
+                    )
+                    true
+                } catch (_: Exception) {
+                    this@MainActivity.fileChooserCallback?.onReceiveValue(null)
+                    this@MainActivity.fileChooserCallback = null
+                    false
+                }
+            }
+        }
         CookieManager.getInstance().setAcceptCookie(true)
         setContentView(webView)
         if (savedInstanceState == null) {
             webView.loadUrl("https://abderezakbentouta-bit.github.io/METALINK/")
         } else {
             webView.restoreState(savedInstanceState)
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == fileChooserRequestCode) {
+            val callback = fileChooserCallback ?: return
+            val results = if (resultCode == RESULT_OK) {
+                WebChromeClient.FileChooserParams.parseResult(resultCode, data)
+            } else {
+                null
+            }
+            callback.onReceiveValue(results)
+            fileChooserCallback = null
         }
     }
 
