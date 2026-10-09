@@ -98,6 +98,48 @@
     });
   });
 
+  // Phone OTP login. Requires phone provider and SMS delivery to be enabled in Supabase.
+  let phoneOtpRequested = false;
+  $('phoneAuthForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const phone = $('authPhone').value.trim().replace(/[\\s().-]/g, '');
+    if (!/^\\+[1-9]\\d{7,14}$/.test(phone)) {
+      showStatus($('authStatus'), 'اكتب رقم الهاتف مع مفتاح الدولة، مثال: +213555123456', 'error');
+      return;
+    }
+    const button = $('sendPhoneCode');
+    button.disabled = true;
+    try {
+      const {error} = await db.auth.signInWithOtp({phone});
+      if (error) throw error;
+      phoneOtpRequested = true;
+      $('phoneCodeLabel').hidden = false;
+      $('verifyPhoneCode').hidden = false;
+      showStatus($('authStatus'), 'تم طلب رمز SMS. أدخل الرمز الذي وصلك.', 'success');
+    } catch (error) {
+      showStatus($('authStatus'), 'تعذر إرسال الرمز. قد تحتاج خدمة SMS إلى التفعيل في Supabase: ' + (error?.message || 'خطأ غير معروف'), 'error');
+    } finally { button.disabled = false; }
+  });
+  $('verifyPhoneCode').addEventListener('click', async () => {
+    if (!phoneOtpRequested) return;
+    const phone = $('authPhone').value.trim().replace(/[\\s().-]/g, '');
+    const token = $('authPhoneCode').value.trim();
+    if (!/^\\d{6}$/.test(token)) {
+      showStatus($('authStatus'), 'أدخل رمز التحقق المكوّن من 6 أرقام.', 'error');
+      return;
+    }
+    const button = $('verifyPhoneCode');
+    button.disabled = true;
+    try {
+      const {data, error} = await db.auth.verifyOtp({phone, token, type:'sms'});
+      if (error) throw error;
+      updateAuthUI(data.user);
+      showStatus($('authStatus'), 'تم تسجيل الدخول بنجاح.', 'success');
+    } catch (error) {
+      showStatus($('authStatus'), 'تعذر التحقق من الرمز: ' + (error?.message || 'خطأ غير معروف'), 'error');
+    } finally { button.disabled = false; }
+  });
+
   // Authentication: keep login, registration, password reset and logout accessible.
   function setAuthMode(mode) {
     authMode = mode;
@@ -105,7 +147,7 @@
     $('signUpMode').classList.toggle('active', mode === 'signup');
     $('authSubmit').textContent = mode === 'signup' ? 'إنشاء حساب' : 'دخول';
     $('authPassword').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
-    showStatus($('authStatus'), mode === 'signup' ? 'أنشئ حسابًا ببريد إلكتروني وكلمة مرور.' : 'أدخل بريدك الإلكتروني وكلمة المرور.');
+    showStatus($('authStatus'), mode === 'signup' ? 'أنشئ حسابًا ببريد إلكتروني وكلمة مرور.' : 'يمكنك الدخول برقم الهاتف أو بالبريد الإلكتروني.');
   }
   $('signInMode').addEventListener('click', () => setAuthMode('signin'));
   $('signUpMode').addEventListener('click', () => setAuthMode('signup'));
@@ -114,6 +156,7 @@
     currentUser = user || null;
     $('accountLabel').textContent = currentUser ? (currentUser.email || 'متصل') : 'زائر';
     $('authSubmit').hidden = !!currentUser;
+    $('phoneAuthForm').hidden = !!currentUser;
     $('signOutButton').hidden = !currentUser;
     $('signInMode').disabled = !!currentUser;
     $('signUpMode').disabled = !!currentUser;
@@ -121,6 +164,7 @@
     $('authPassword').hidden = !!currentUser;
     if (currentUser) {
       $('authEmail').value = currentUser.email || '';
+      $('authPhone').value = currentUser.phone || '';
       $('authPassword').value = '';
       showStatus($('authStatus'), 'أنت متصل الآن. يمكنك نشر الحمولة وفتح الرسائل.', 'success');
       loadConversations();
