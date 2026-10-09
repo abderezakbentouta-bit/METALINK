@@ -14,7 +14,7 @@
   <nav id="mainNav">
     <a class="active" href="#accueil">Accueil</a><a href="#categories">Produits</a><a href="#logistique">Logistique</a><a href="#fournisseurs">Fournisseurs</a><a href="#acheteurs">Acheteurs</a><a href="#apropos">À propos</a><a href="#contact">Contact</a>
   </nav>
-  <div class="top-actions"><a class="login" href="#contact">Connexion</a><a class="btn btn-small" href="#contact">S'inscrire</a></div>
+  <div class="top-actions"><a class="login" href="#auth">Connexion</a><a class="btn btn-small" href="#auth">S'inscrire</a></div>
 </header>
 
 <main>
@@ -134,7 +134,23 @@
 
 <section class="cta" id="fournisseurs"><div><p class="eyebrow">VOUS ÊTES FOURNISSEUR OU ACHETEUR ?</p><h2>Le prochain projet commence par une connexion.</h2><p>Préparez votre présence sur une plateforme dédiée aux professionnels du métal.</p></div><a class="btn" href="#contact">Découvrir MetaLink <span>→</span></a></section>
 
-<section class="contact-section" id="contact"><div><p class="eyebrow orange">RESTONS EN CONTACT</p><h2>Construisons le réseau MetaLink.</h2><p>Cette première version est une maquette fonctionnelle. Les comptes, les annonces et les demandes de devis seront connectés à une base de données dans une prochaine étape.</p></div><form id="contactForm"><label>Votre profil<select required><option value="">Sélectionner</option><option>Fournisseur</option><option>Acheteur</option><option>Entreprise de construction métallique</option><option>Autre professionnel</option></select></label><label>Votre adresse e-mail<input type="email" placeholder="vous@entreprise.com" required></label><button class="btn" type="submit">Préparer ma demande →</button><p id="formMessage" aria-live="polite"></p></form></section>
+
+<section class="section auth-section" id="auth">
+  <div class="auth-intro"><p class="eyebrow orange">ESPACE PROFESSIONNEL</p><h2>Connexion à MetaLink</h2><p>Connectez-vous pour publier une offre de transport ou une demande. Les annonces sont associées à votre compte.</p></div>
+  <div class="auth-card">
+    <div class="auth-tabs"><button type="button" class="auth-tab active" id="signInMode">Connexion</button><button type="button" class="auth-tab" id="signUpMode">Créer un compte</button></div>
+    <form id="authForm">
+      <label>Adresse e-mail<input id="authEmail" type="email" autocomplete="email" required placeholder="vous@entreprise.com"></label>
+      <label>Mot de passe<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="Au moins 6 caractères"></label>
+      <button class="btn" id="authSubmit" type="submit">Se connecter →</button>
+    </form>
+    <button class="auth-reset" id="resetPassword" type="button">Mot de passe oublié ?</button>
+    <div class="auth-status" id="authStatus" aria-live="polite">Vous n’êtes pas connecté.</div>
+    <button class="auth-signout" id="signOutButton" type="button" hidden>Se déconnecter</button>
+  </div>
+</section>
+
+<section class="contact-section" id="contact"><div><p class="eyebrow orange">RESTONS EN CONTACT</p><h2>Construisons le réseau MetaLink.</h2><p>La connexion et les annonces de transport utilisent Supabase. Les autres fonctions seront activées progressivement.</p></div><form id="contactForm"><label>Votre profil<select required><option value="">Sélectionner</option><option>Fournisseur</option><option>Acheteur</option><option>Entreprise de construction métallique</option><option>Autre professionnel</option></select></label><label>Votre adresse e-mail<input type="email" placeholder="vous@entreprise.com" required></label><button class="btn" type="submit">Préparer ma demande →</button><p id="formMessage" aria-live="polite"></p></form></section>
 </main>
 
 <footer><a class="brand" href="#accueil"><span class="brand-mark">∞</span><span><b>Meta<span>Link</span></b><small>Le métal connecte vos projets</small></span></a><p>La place de marché dédiée aux professionnels du métal.</p><small>© 2026 MetaLink — Version de démonstration. Les produits affichés sont des exemples, pas des offres commerciales.</small></footer>
