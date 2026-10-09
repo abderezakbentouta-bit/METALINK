@@ -266,7 +266,8 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
   loadListings();
 })();
 
-/* Demonstration-only chat and advertising brief. No messages or ad requests are transmitted. */
+/* Chat remains clearly marked as a demo until a real conversation is selected.
+   Advertising requests are saved to ad_requests for the authenticated user. */
 (() => {
   const chatForm = document.getElementById('chatDemoForm');
   const chatInput = document.getElementById('chatDemoInput');
@@ -274,29 +275,71 @@ document.querySelectorAll('.logistics-contact').forEach(link => {
   const chatStatus = document.getElementById('chatDemoStatus');
   chatForm?.addEventListener('submit', event => {
     event.preventDefault();
-    const value = chatInput?.value.trim();
-    if (!value || !chatMessages) return;
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-message driver demo-local-message';
-    const label = document.createElement('small');
-    label.textContent = 'Votre message · aperçu local';
-    const paragraph = document.createElement('p');
-    paragraph.textContent = value;
-    const time = document.createElement('time');
-    time.textContent = 'Non envoyé · non enregistré';
-    bubble.append(label, paragraph, time);
-    chatMessages.appendChild(bubble);
-    chatInput.value = '';
-    chatStatus.textContent = 'Message ajouté à l’aperçu sur cet appareil uniquement. Il n’a pas été envoyé à Hamid ni à Ultra Fer.';
-    bubble.scrollIntoView({behavior:'smooth', block:'nearest'});
+    if (chatStatus) chatStatus.textContent = 'الدردشة الحقيقية لم تُفعّل في هذه الواجهة بعد. لم يتم إرسال الرسالة أو حفظها.';
   });
+
   const adForm = document.getElementById('adRequestForm');
   const adStatus = document.getElementById('adRequestStatus');
-  adForm?.addEventListener('submit', event => {
+  if (!adForm) return;
+
+  adForm.addEventListener('submit', async event => {
     event.preventDefault();
     if (!adForm.reportValidity()) return;
+    const submitButton = adForm.querySelector('button[type="submit"]');
     const data = new FormData(adForm);
-    adStatus.textContent = 'Brief préparé pour ' + String(data.get('company') || 'votre entreprise') + ' (' + String(data.get('style') || 'style à définir') + '). Rien n’a été envoyé ni enregistré : la table sécurisée des demandes publicitaires doit être créée avant activation.';
-    adStatus.classList.add('prepared');
+    const companyName = String(data.get('company') || '').trim();
+    const adType = String(data.get('adType') || '').trim();
+    const requestedStyle = String(data.get('style') || '').trim();
+    const brief = String(data.get('brief') || '').trim();
+    const contactDetails = String(data.get('contact') || '').trim();
+
+    if (!window.supabase) {
+      adStatus.textContent = 'تعذر الاتصال بخدمة قاعدة البيانات. حدّث الصفحة وحاول مجددًا.';
+      adStatus.classList.add('error');
+      return;
+    }
+
+    const SUPABASE_URL = 'https://wfdkelpwmgcnmuqzuptl.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ajabL-jTRAkdzZ80r2zywQ_X-ECu5yO';
+    const adDb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Envoi en cours…';
+    }
+    adStatus.classList.remove('error', 'prepared');
+
+    try {
+      const { data: authData, error: authError } = await adDb.auth.getUser();
+      if (authError) throw authError;
+      const user = authData?.user;
+      if (!user) {
+        adStatus.textContent = 'يرجى تسجيل الدخول أولًا قبل إرسال طلب الإشهار. لم يتم حفظ أي بيانات.';
+        document.getElementById('auth')?.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      const { error } = await adDb.from('ad_requests').insert({
+        user_id: user.id,
+        company_name: companyName,
+        ad_type: adType,
+        requested_style: requestedStyle,
+        brief,
+        contact_details: contactDetails,
+        status: 'pending'
+      });
+      if (error) throw error;
+
+      adStatus.textContent = 'تم إرسال طلب الإشهار وحفظه بنجاح. حالته الآن: قيد المراجعة.';
+      adStatus.classList.add('prepared');
+      adForm.reset();
+    } catch (error) {
+      adStatus.textContent = 'تعذر حفظ طلب الإشهار: ' + (error?.message || 'خطأ غير معروف') + '. تحقق من تسجيل الدخول وسياسات RLS ثم أعد المحاولة.';
+      adStatus.classList.add('error');
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'إرسال طلب الإشهار ↗';
+      }
+    }
   });
 })();
