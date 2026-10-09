@@ -1,345 +1,497 @@
-const menuToggle = document.getElementById('menuToggle');
-const mainNav = document.getElementById('mainNav');
-menuToggle?.addEventListener('click', () => {
-  const open = mainNav.classList.toggle('open');
-  menuToggle.setAttribute('aria-expanded', String(open));
-});
-mainNav?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mainNav.classList.remove('open')));
-
-const searchForm = document.getElementById('searchForm');
-const searchInput = document.getElementById('searchInput');
-const productCards = [...document.querySelectorAll('.product-card')];
-const noResults = document.getElementById('noResults');
-function filterProducts(term) {
-  const q = term.trim().toLocaleLowerCase('fr');
-  let visible = 0;
-  productCards.forEach(card => {
-    const match = !q || card.dataset.name.toLocaleLowerCase('fr').includes(q) || card.textContent.toLocaleLowerCase('fr').includes(q);
-    card.hidden = !match;
-    if (match) visible++;
-  });
-  noResults.hidden = visible > 0;
-  document.getElementById('produits').scrollIntoView({behavior:'smooth'});
-}
-searchForm?.addEventListener('submit', e => {
-  e.preventDefault();
-  filterProducts(searchInput.value);
-});
-document.querySelectorAll('.category-card').forEach(card => {
-  card.addEventListener('click', () => {
-    const terms = card.dataset.search.split(' ');
-    searchInput.value = terms[0];
-    filterProducts(terms[0]);
-  });
-});
-document.getElementById('contactForm')?.addEventListener('submit', e => {
-  e.preventDefault();
-  document.getElementById('formMessage').textContent = 'Merci ! Le formulaire est une démonstration : aucun message n’a été envoyé.';
-});
-
-// Logistics demo CTA scrolls to the contact form; no real booking is sent.
-document.querySelectorAll('.logistics-contact').forEach(link => {
-  link.addEventListener('click', () => {
-    const profile = document.querySelector('#contactForm select');
-    if (profile) profile.value = 'Acheteur';
-  });
-});
-
-// MetaLink Logistique connected to Supabase (public publishable key only).
 (() => {
+  'use strict';
+
   const SUPABASE_URL = 'https://wfdkelpwmgcnmuqzuptl.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ajabL-jTRAkdzZ80r2zywQ_X-ECu5yO';
-  const tabs = document.querySelectorAll('.logistics-tab');
-  const carrierForm = document.getElementById('carrierForm');
-  const shipperForm = document.getElementById('shipperForm');
-  const listings = document.getElementById('logisticsListings');
-  const status = document.getElementById('logisticsStatus');
-  if (!carrierForm || !shipperForm || !listings) return;
+  const $ = (id) => document.getElementById(id);
+  const safe = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const dateText = (value) => {
+    if (!value) return 'التاريخ غير محدد';
+    const parts = String(value).split('-');
+    return parts.length === 3 ? parts[2] + '/' + parts[1] + '/' + parts[0] : String(value);
+  };
+  const showStatus = (element, message, kind = '') => {
+    if (!element) return;
+    element.textContent = message;
+    element.classList.remove('error', 'success');
+    if (kind) element.classList.add(kind);
+    element.hidden = !message;
+  };
 
   if (!window.supabase) {
-    status.hidden = false;
-    status.textContent = 'Connexion impossible : la bibliothèque de base de données ne s’est pas chargée. Vérifiez votre connexion Internet.';
+    showStatus($('logisticsStatus'), 'تعذر تحميل خدمة الاتصال. تحقق من الإنترنت ثم حدّث الصفحة.', 'error');
     return;
   }
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-  const authForm = document.getElementById('authForm');
-  const authEmail = document.getElementById('authEmail');
-  const authPassword = document.getElementById('authPassword');
-  const authStatus = document.getElementById('authStatus');
-  const authSubmit = document.getElementById('authSubmit');
-  const signInMode = document.getElementById('signInMode');
-  const signUpMode = document.getElementById('signUpMode');
-  const resetPassword = document.getElementById('resetPassword');
-  const signOutButton = document.getElementById('signOutButton');
-  let authMode = 'signin';
   let currentUser = null;
-  function showAuthMessage(message, isError = false) {
-    if (!authStatus) return;
-    authStatus.textContent = message;
-    authStatus.classList.toggle('error', isError);
-  }
+  let authMode = 'signin';
+  let announcements = [];
+  let conversations = [];
+  let activeConversation = null;
+  let refreshTimer = null;
+
+  // Main navigation actions: the four big buttons scroll directly to their task.
+  document.querySelectorAll('.quick-card').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (link.getAttribute('href') === '#publish') {
+        const isCarrier = link.classList.contains('blue-card');
+        document.querySelectorAll('.switch').forEach((button) => {
+          const active = button.dataset.panel === (isCarrier ? 'carrierPanel' : 'shipperPanel');
+          button.classList.toggle('active', active);
+          button.setAttribute('aria-selected', String(active));
+        });
+        $('carrierPanel').classList.toggle('active', isCarrier);
+        $('shipperPanel').classList.toggle('active', !isCarrier);
+      }
+    });
+  });
+
+  document.querySelectorAll('.switch').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.switch').forEach((other) => {
+        const active = other === button;
+        other.classList.toggle('active', active);
+        other.setAttribute('aria-selected', String(active));
+      });
+      $('carrierPanel').classList.toggle('active', button.dataset.panel === 'carrierPanel');
+      $('shipperPanel').classList.toggle('active', button.dataset.panel === 'shipperPanel');
+    });
+  });
+
+  // Voice input is optional and only uses the browser's speech recognition when available.
+  document.querySelectorAll('[data-voice-for]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = $(button.dataset.voiceFor);
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        const status = button.closest('form')?.querySelector('.status-message') || $('logisticsStatus');
+        showStatus(status, 'الإملاء الصوتي غير مدعوم في هذا المتصفح. يمكنك الكتابة أو استخدام لوحة المفاتيح الصوتية في الهاتف.', 'error');
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ar-DZ';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      button.classList.add('listening');
+      button.disabled = true;
+      recognition.onresult = (event) => {
+        const spoken = event.results?.[0]?.[0]?.transcript || '';
+        if (target) {
+          if (target.tagName === 'TEXTAREA' && target.value.trim()) target.value += ' ' + spoken;
+          else target.value = spoken;
+          target.dispatchEvent(new Event('input', {bubbles:true}));
+        }
+      };
+      recognition.onerror = () => {
+        const status = button.closest('form')?.querySelector('.status-message') || $('logisticsStatus');
+        showStatus(status, 'لم نتمكن من سماع الصوت. جرّب مرة أخرى أو استخدم لوحة المفاتيح.', 'error');
+      };
+      recognition.onend = () => {
+        button.classList.remove('listening');
+        button.disabled = false;
+      };
+      try { recognition.start(); }
+      catch (_) {
+        button.classList.remove('listening');
+        button.disabled = false;
+      }
+    });
+  });
+
+  // Authentication: keep login, registration, password reset and logout accessible.
   function setAuthMode(mode) {
     authMode = mode;
-    signInMode?.classList.toggle('active', mode === 'signin');
-    signUpMode?.classList.toggle('active', mode === 'signup');
-    if (authSubmit) authSubmit.textContent = mode === 'signup' ? 'Créer mon compte →' : 'Se connecter →';
-    if (authPassword) authPassword.autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
-    showAuthMessage(mode === 'signup' ? 'Créez un compte avec votre adresse e-mail.' : 'Saisissez votre adresse e-mail et votre mot de passe.');
+    $('signInMode').classList.toggle('active', mode === 'signin');
+    $('signUpMode').classList.toggle('active', mode === 'signup');
+    $('authSubmit').textContent = mode === 'signup' ? 'إنشاء حساب' : 'دخول';
+    $('authPassword').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+    showStatus($('authStatus'), mode === 'signup' ? 'أنشئ حسابًا ببريد إلكتروني وكلمة مرور.' : 'أدخل بريدك الإلكتروني وكلمة المرور.');
   }
-  signInMode?.addEventListener('click', () => setAuthMode('signin'));
-  signUpMode?.addEventListener('click', () => setAuthMode('signup'));
+  $('signInMode').addEventListener('click', () => setAuthMode('signin'));
+  $('signUpMode').addEventListener('click', () => setAuthMode('signup'));
+
   function updateAuthUI(user) {
     currentUser = user || null;
+    $('accountLabel').textContent = currentUser ? (currentUser.email || 'متصل') : 'زائر';
+    $('authSubmit').hidden = !!currentUser;
+    $('signOutButton').hidden = !currentUser;
+    $('signInMode').disabled = !!currentUser;
+    $('signUpMode').disabled = !!currentUser;
+    $('authEmail').readOnly = !!currentUser;
+    $('authPassword').hidden = !!currentUser;
     if (currentUser) {
-      showAuthMessage('Connecté : ' + (currentUser.email || 'compte MetaLink') + '. Vous pouvez publier vos annonces.');
-      if (signOutButton) signOutButton.hidden = false;
-      if (authSubmit) authSubmit.hidden = true;
-      if (authEmail) authEmail.value = currentUser.email || '';
-      if (authPassword) authPassword.value = '';
+      $('authEmail').value = currentUser.email || '';
+      $('authPassword').value = '';
+      showStatus($('authStatus'), 'أنت متصل الآن. يمكنك نشر الحمولة وفتح الرسائل.', 'success');
+      loadConversations();
     } else {
-      showAuthMessage('Vous n’êtes pas connecté. Connectez-vous pour publier une annonce.');
-      if (signOutButton) signOutButton.hidden = true;
-      if (authSubmit) authSubmit.hidden = false;
+      $('authEmail').readOnly = false;
+      $('authPassword').hidden = false;
+      $('authPassword').required = true;
+      showStatus($('authStatus'), 'لم تسجل الدخول. يمكنك تصفح العروض، ويلزم الدخول للنشر والمراسلة.');
+      conversations = [];
+      activeConversation = null;
+      $('chatPanel').hidden = true;
+      renderConversations();
     }
   }
-  authForm?.addEventListener('submit', async event => {
+
+  $('authForm').addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (!authEmail?.value || !authPassword?.value) return;
-    authSubmit.disabled = true;
-    authSubmit.textContent = authMode === 'signup' ? 'Création en cours…' : 'Connexion…';
+    if (!$('authForm').reportValidity()) return;
+    const button = $('authSubmit');
+    button.disabled = true;
+    button.textContent = authMode === 'signup' ? 'جارٍ إنشاء الحساب…' : 'جارٍ الدخول…';
     try {
-      const email = authEmail.value.trim();
-      const password = authPassword.value;
+      const email = $('authEmail').value.trim();
+      const password = $('authPassword').value;
       if (authMode === 'signup') {
-        const { data, error } = await db.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + window.location.pathname } });
+        const {data, error} = await db.auth.signUp({
+          email, password,
+          options: {emailRedirectTo: window.location.origin + window.location.pathname}
+        });
         if (error) throw error;
-        if (data.session) updateAuthUI(data.user);
-        else showAuthMessage('Compte créé. Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.');
+        if (data.session && data.user) updateAuthUI(data.user);
+        else showStatus($('authStatus'), 'تم إنشاء الحساب. افتح بريدك الإلكتروني واضغط رابط التأكيد، ثم عد إلى التطبيق للدخول.', 'success');
       } else {
-        const { data, error } = await db.auth.signInWithPassword({ email, password });
+        const {data, error} = await db.auth.signInWithPassword({email, password});
         if (error) throw error;
         updateAuthUI(data.user);
       }
     } catch (error) {
-      showAuthMessage(error.message || 'Échec de l’authentification. Vérifiez les informations et les réglages Supabase.', true);
+      showStatus($('authStatus'), 'تعذر الدخول: ' + (error?.message || 'خطأ غير معروف'), 'error');
     } finally {
-      authSubmit.disabled = false;
-      if (!currentUser) authSubmit.textContent = authMode === 'signup' ? 'Créer mon compte →' : 'Se connecter →';
+      button.disabled = false;
+      if (!currentUser) button.textContent = authMode === 'signup' ? 'إنشاء حساب' : 'دخول';
     }
   });
-  resetPassword?.addEventListener('click', async () => {
-    const email = authEmail?.value.trim();
+
+  $('resetPassword').addEventListener('click', async () => {
+    const email = $('authEmail').value.trim();
     if (!email) {
-      showAuthMessage('Saisissez d’abord votre adresse e-mail pour recevoir le lien de réinitialisation.', true);
-      authEmail?.focus();
+      showStatus($('authStatus'), 'اكتب بريدك الإلكتروني أولًا، ثم اضغط نسيت كلمة المرور.', 'error');
+      $('authEmail').focus();
       return;
     }
-    resetPassword.disabled = true;
     try {
-      const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+      const {error} = await db.auth.resetPasswordForEmail(email, {redirectTo: window.location.origin + window.location.pathname});
       if (error) throw error;
-      showAuthMessage('Si cette adresse est enregistrée, un e-mail de réinitialisation va être envoyé.');
+      showStatus($('authStatus'), 'إذا كان البريد مسجلًا، ستصلك رسالة لإعادة تعيين كلمة المرور.', 'success');
     } catch (error) {
-      showAuthMessage(error.message || 'Impossible d’envoyer le lien de réinitialisation.', true);
-    } finally {
-      resetPassword.disabled = false;
+      showStatus($('authStatus'), 'تعذر إرسال الرابط: ' + (error?.message || 'خطأ غير معروف'), 'error');
     }
   });
-  signOutButton?.addEventListener('click', async () => {
-    signOutButton.disabled = true;
-    const { error } = await db.auth.signOut();
-    signOutButton.disabled = false;
-    if (error) showAuthMessage(error.message, true);
-    else updateAuthUI(null);
+
+  $('signOutButton').addEventListener('click', async () => {
+    const button = $('signOutButton');
+    button.disabled = true;
+    try {
+      const {error} = await db.auth.signOut();
+      if (error) throw error;
+      updateAuthUI(null);
+      $('authEmail').value = '';
+      $('authPassword').value = '';
+      setAuthMode('signin');
+      $('account').scrollIntoView({behavior:'smooth'});
+    } catch (error) {
+      showStatus($('authStatus'), 'تعذر الخروج: ' + (error?.message || 'خطأ غير معروف'), 'error');
+    } finally {
+      button.disabled = false;
+    }
   });
-  db.auth.getSession().then(({ data, error }) => {
-    if (error) showAuthMessage(error.message, true);
-    updateAuthUI(data?.session?.user || null);
-  });
-  db.auth.onAuthStateChange((_event, session) => updateAuthUI(session?.user || null));
 
-
-  tabs.forEach(tab => tab.addEventListener('click', () => {
-    tabs.forEach(item => {
-      const active = item === tab;
-      item.classList.toggle('active', active);
-      item.setAttribute('aria-selected', String(active));
-    });
-    document.getElementById('carrierPanel')?.classList.toggle('active', tab.dataset.panel === 'carrierPanel');
-    document.getElementById('shipperPanel')?.classList.toggle('active', tab.dataset.panel === 'shipperPanel');
-    (tab.dataset.panel === 'carrierPanel' ? carrierForm : shipperForm).scrollIntoView({behavior:'smooth', block:'center'});
-  }));
-
-  function escapeText(value) {
-    return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  }
-  function displayDate(value) {
-    if (!value) return 'Date à convenir';
-    const parts = value.split('-');
-    return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
-  }
+  // Transport listings use the existing annonces table and current RLS rules.
   function renderListing(row) {
-    const isCarrier = row.type_annonce === 'offre_transport';
-    const title = isCarrier ? 'Camion disponible' : 'Demande de transport';
-    const subtitle = isCarrier
-      ? `${row.type_camion || 'Camion à préciser'} · ${row.quantite_tonnes ?? '—'} t`
-      : `${row.marchandise || 'Marchandise à préciser'} · ${row.quantite_tonnes ?? '—'} t`;
-    const info = row.informations || 'Aucune information complémentaire';
+    const carrier = row.type_annonce === 'offre_transport';
+    const title = carrier ? 'شاحنة متاحة' : 'طلب نقل';
+    const subtitle = carrier
+      ? (row.type_camion || 'نوع الشاحنة غير محدد') + ' · ' + (row.quantite_tonnes ?? '—') + ' طن'
+      : (row.marchandise || 'البضاعة غير محددة') + ' · ' + (row.quantite_tonnes ?? '—') + ' طن';
+    const info = String(row.informations || '');
     const dateMatch = info.match(/Date : ([^|]+)/);
     const priceMatch = info.match(/(?:Prix souhaité|Budget indicatif) : ([^|]+)/);
-    const details = info.split('|').map(part => part.trim()).filter(part => !/^Date :|^Prix souhaité :|^Budget indicatif :/.test(part)).join(' · ');
+    const extra = info.split('|').map((part) => part.trim()).filter((part) => !/^Date :|^Prix souhaité :|^Budget indicatif :/.test(part)).join(' · ');
     const card = document.createElement('article');
     card.className = 'listing-card';
-    card.innerHTML = `<div class="listing-type ${isCarrier ? 'carrier' : 'shipper'}">${isCarrier ? '🚚 OFFRE TRANSPORTEUR' : '📦 DEMANDE CLIENT'}</div>
-      <div class="listing-main"><h4>${escapeText(title)} : ${escapeText(row.ville_depart)} → ${escapeText(row.ville_arrivee)}</h4>
-      <p>${escapeText(subtitle)}</p><p>${isCarrier ? 'Marchandises acceptées' : 'Détails'} : ${escapeText(details || 'À préciser')}</p></div>
-      <div class="listing-meta"><span>📅 ${escapeText(displayDate(dateMatch ? dateMatch[1].trim() : ''))}</span><span>💰 ${escapeText(priceMatch ? priceMatch[1].trim() : 'À négocier')}</span><span>☎ ${escapeText(row.telephone || 'Non indiqué')}</span></div>`;
+    const call = String(row.telephone || '').trim();
+    card.innerHTML = `
+      <div class="listing-top">
+        <span class="listing-kind ${carrier ? '' : 'request'}">${carrier ? '🚛 شاحنة' : '📦 حمولة'}</span>
+        <div class="listing-main"><h3>${safe(row.ville_depart || '؟')} ← ${safe(row.ville_arrivee || '؟')}</h3><p>${safe(subtitle)}</p></div>
+      </div>
+      <div class="listing-facts">
+        <span class="fact">📅 ${safe(dateText(dateMatch ? dateMatch[1].trim() : ''))}</span>
+        <span class="fact">💰 ${safe(priceMatch ? priceMatch[1].trim() : 'السعر بالتفاوض')}</span>
+        ${extra ? '<span class="fact">📝 ' + safe(extra) + '</span>' : ''}
+      </div>
+      <div class="listing-actions">
+        ${call ? '<a class="call-button" href="tel:' + safe(call.replace(/[^+\d]/g,'')) + '">📞 اتصال</a>' : ''}
+        ${currentUser && row.user_id && row.user_id !== currentUser.id ? '<button type="button" data-chat-user="' + safe(row.user_id) + '" data-listing-id="' + safe(row.id) + '">💬 مراسلة</button>' : ''}
+        ${currentUser && row.user_id === currentUser.id ? '<span class="fact">إعلانك</span>' : ''}
+        ${!currentUser ? '<a href="#account">🔐 دخول للمراسلة</a>' : ''}
+      </div>`;
+    const messageButton = card.querySelector('[data-chat-user]');
+    messageButton?.addEventListener('click', () => startConversation(row));
     return card;
   }
+
   async function loadListings() {
-    listings.innerHTML = '<p class="empty-list">Chargement des annonces…</p>';
-    const { data, error } = await db.from('annonces').select('*').order('created_at', { ascending: false }).limit(100);
+    const container = $('logisticsListings');
+    container.innerHTML = '<p class="empty-state">جارٍ تحميل الإعلانات…</p>';
+    const {data, error} = await db.from('annonces').select('*').order('created_at', {ascending:false}).limit(100);
     if (error) {
-      listings.innerHTML = '<p class="empty-list">Impossible de charger les annonces. Vérifiez les paramètres Supabase et les politiques RLS.</p>';
-      status.hidden = false;
-      status.textContent = `Erreur de lecture : ${error.message}`;
+      container.innerHTML = '';
+      showStatus($('logisticsStatus'), 'تعذر تحميل الإعلانات: ' + error.message, 'error');
+      container.innerHTML = '<p class="empty-state">تعذر تحميل العروض. تحقق من اتصال الإنترنت.</p>';
       return;
     }
-    listings.innerHTML = '';
-    if (!data || data.length === 0) {
-      listings.innerHTML = '<p class="empty-list">Aucune annonce pour le moment. Publiez la première offre ou demande.</p>';
+    announcements = data || [];
+    container.innerHTML = '';
+    if (!announcements.length) {
+      container.innerHTML = '<p class="empty-state">لا توجد عروض بعد. كن أول من ينشر شاحنة أو طلب نقل.</p>';
       return;
     }
-    data.forEach(row => listings.appendChild(renderListing(row)));
+    announcements.forEach((row) => container.appendChild(renderListing(row)));
   }
-  async function submitToDatabase(form, type) {
-    form.addEventListener('submit', async event => {
+  $('refreshListings').addEventListener('click', loadListings);
+
+  async function publishTransport(form, type) {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!form.reportValidity()) return;
-      const data = Object.fromEntries(new FormData(form).entries());
-      const isCarrier = type === 'carrier';
-      const infoParts = [`Date : ${data.date || 'À convenir'}`];
-      const price = isCarrier ? data.price : data.budget;
-      infoParts.push(`${isCarrier ? 'Prix souhaité' : 'Budget indicatif'} : ${price ? `${Number(price).toLocaleString('fr-FR')} DA` : 'À négocier'}`);
-      const details = isCarrier ? data.cargo : data.details;
-      if (details && details.trim()) infoParts.push(details.trim());
-      const button = form.querySelector('button[type="submit"]');
       if (!currentUser) {
-        if (button) {
-          button.disabled = false;
-          button.textContent = isCarrier ? 'Publier l’offre de transport →' : 'Publier ma demande →';
-        }
-        status.hidden = false;
-        status.textContent = 'Connectez-vous ou créez un compte dans la section Connexion avant de publier.';
-        document.getElementById('auth')?.scrollIntoView({behavior:'smooth'});
+        showStatus($('logisticsStatus'), 'سجّل الدخول أولًا حتى نربط الإعلان بحسابك.', 'error');
+        $('account').scrollIntoView({behavior:'smooth'});
         return;
       }
+      const values = Object.fromEntries(new FormData(form).entries());
+      const carrier = type === 'carrier';
+      const button = form.querySelector('button[type="submit"]');
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'جارٍ النشر…';
+      showStatus($('logisticsStatus'), 'جارٍ حفظ الإعلان…');
+      const info = [
+        'Date : ' + (values.date || 'À convenir'),
+        (carrier ? 'Prix souhaité' : 'Budget indicatif') + ' : ' + (values[carrier ? 'price' : 'budget'] ? Number(values[carrier ? 'price' : 'budget']).toLocaleString('fr-FR') + ' DA' : 'À négocier')
+      ];
+      const details = carrier ? values.cargo : values.details;
+      if (details?.trim()) info.push(details.trim());
       const row = {
         user_id: currentUser.id,
-        type_annonce: isCarrier ? 'offre_transport' : 'demande_transport',
-        ville_depart: data.origin.trim(),
-        ville_arrivee: data.destination.trim(),
-        marchandise: isCarrier ? (data.cargo || 'À préciser') : data.cargoType,
-        quantite_tonnes: Number(isCarrier ? data.capacity : data.weight),
-        type_camion: isCarrier ? data.vehicle : null,
-        telephone: data.phone.trim(),
-        informations: infoParts.join(' | ')
+        type_annonce: carrier ? 'offre_transport' : 'demande_transport',
+        ville_depart: values.origin.trim(),
+        ville_arrivee: values.destination.trim(),
+        marchandise: carrier ? (values.cargo?.trim() || 'À préciser') : values.cargoType,
+        quantite_tonnes: Number(carrier ? values.capacity : values.weight),
+        type_camion: carrier ? values.vehicle : null,
+        telephone: values.phone.trim(),
+        informations: info.join(' | ')
       };
-      if (button) { button.disabled = true; button.textContent = 'Publication en cours…'; }
-      status.hidden = false;
-      status.textContent = 'Envoi de votre annonce…';
-      const { error } = await db.from('annonces').insert(row);
-      if (button) { button.disabled = false; button.textContent = isCarrier ? 'Publier l’offre de transport →' : 'Publier ma demande →'; }
-      if (error) {
-        status.textContent = `Échec de la publication : ${error.message}. Vérifiez la connexion et les règles de la base de données.`;
-        return;
+      try {
+        const {error} = await db.from('annonces').insert(row);
+        if (error) throw error;
+        showStatus($('logisticsStatus'), 'تم نشر إعلانك بنجاح ✅', 'success');
+        form.reset();
+        await loadListings();
+        $('loads').scrollIntoView({behavior:'smooth'});
+      } catch (error) {
+        showStatus($('logisticsStatus'), 'لم يُنشر الإعلان: ' + (error?.message || 'خطأ غير معروف'), 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
       }
-      status.textContent = 'Annonce publiée avec succès ! Elle est maintenant enregistrée dans la base de données.';
-      form.reset();
-      await loadListings();
-      listings.scrollIntoView({behavior:'smooth', block:'nearest'});
     });
   }
-  submitToDatabase(carrierForm, 'carrier');
-  submitToDatabase(shipperForm, 'shipper');
-  loadListings();
-})();
+  publishTransport($('carrierForm'), 'carrier');
+  publishTransport($('shipperForm'), 'shipper');
 
-/* Chat remains clearly marked as a demo until a real conversation is selected.
-   Advertising requests are saved to ad_requests for the authenticated user. */
-(() => {
-  const chatForm = document.getElementById('chatDemoForm');
-  const chatInput = document.getElementById('chatDemoInput');
-  const chatMessages = document.getElementById('driverChatMessages');
-  const chatStatus = document.getElementById('chatDemoStatus');
-  chatForm?.addEventListener('submit', event => {
-    event.preventDefault();
-    if (chatStatus) chatStatus.textContent = 'الدردشة الحقيقية لم تُفعّل في هذه الواجهة بعد. لم يتم إرسال الرسالة أو حفظها.';
-  });
-
-  const adForm = document.getElementById('adRequestForm');
-  const adStatus = document.getElementById('adRequestStatus');
-  if (!adForm) return;
-
-  adForm.addEventListener('submit', async event => {
-    event.preventDefault();
-    if (!adForm.reportValidity()) return;
-    const submitButton = adForm.querySelector('button[type="submit"]');
-    const data = new FormData(adForm);
-    const companyName = String(data.get('company') || '').trim();
-    const adType = String(data.get('adType') || '').trim();
-    const requestedStyle = String(data.get('style') || '').trim();
-    const brief = String(data.get('brief') || '').trim();
-    const contactDetails = String(data.get('contact') || '').trim();
-
-    if (!window.supabase) {
-      adStatus.textContent = 'تعذر الاتصال بخدمة قاعدة البيانات. حدّث الصفحة وحاول مجددًا.';
-      adStatus.classList.add('error');
+  // Private chat uses chat_conversations/chat_messages with the existing participant RLS policies.
+  function renderConversations() {
+    const container = $('conversationList');
+    container.innerHTML = '';
+    if (!currentUser) {
+      container.innerHTML = '<p class="empty-state">سجّل الدخول لعرض رسائلك.</p>';
       return;
     }
-
-    const SUPABASE_URL = 'https://wfdkelpwmgcnmuqzuptl.supabase.co';
-    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ajabL-jTRAkdzZ80r2zywQ_X-ECu5yO';
-    const adDb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = 'Envoi en cours…';
+    if (!conversations.length) {
+      container.innerHTML = '<p class="empty-state">لا توجد محادثات بعد. افتح إعلانًا واضغط «مراسلة» لبدء محادثة خاصة.</p>';
+      return;
     }
-    adStatus.classList.remove('error', 'prepared');
+    conversations.forEach((conversation) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'conversation-item';
+      const peer = conversation.participant_one === currentUser.id ? conversation.participant_two : conversation.participant_one;
+      item.innerHTML = '<span class="conversation-icon">💬</span><span><strong>محادثة نقل</strong><small>' + safe(conversation.context || 'محادثة مع مستخدم MetaLink') + '</small></span><span aria-hidden="true">←</span>';
+      item.addEventListener('click', () => openConversation(conversation, peer));
+      container.appendChild(item);
+    });
+  }
 
+  async function loadConversations() {
+    if (!currentUser) return;
+    const {data, error} = await db.from('chat_conversations').select('*').order('created_at', {ascending:false});
+    if (error) {
+      showStatus($('chatStatus'), 'تعذر تحميل المحادثات: ' + error.message, 'error');
+      return;
+    }
+    conversations = data || [];
+    renderConversations();
+  }
+
+  async function startConversation(listing) {
+    if (!currentUser) {
+      showStatus($('authStatus'), 'سجّل الدخول أولًا حتى تراسل صاحب الإعلان.', 'error');
+      $('account').scrollIntoView({behavior:'smooth'});
+      return;
+    }
+    if (!listing.user_id || listing.user_id === currentUser.id) return;
+    const button = document.querySelector('[data-chat-user="' + CSS.escape(listing.user_id) + '"]');
+    if (button) { button.disabled = true; button.textContent = 'جارٍ فتح المحادثة…'; }
     try {
-      const { data: authData, error: authError } = await adDb.auth.getUser();
-      if (authError) throw authError;
-      const user = authData?.user;
-      if (!user) {
-        adStatus.textContent = 'يرجى تسجيل الدخول أولًا قبل إرسال طلب الإشهار. لم يتم حفظ أي بيانات.';
-        document.getElementById('auth')?.scrollIntoView({ behavior: 'smooth' });
-        return;
+      await loadConversations();
+      let conversation = conversations.find((item) =>
+        (item.participant_one === currentUser.id && item.participant_two === listing.user_id) ||
+        (item.participant_two === currentUser.id && item.participant_one === listing.user_id)
+      );
+      if (!conversation) {
+        const context = 'نقل: ' + (listing.ville_depart || '؟') + ' → ' + (listing.ville_arrivee || '؟');
+        const {data, error} = await db.from('chat_conversations').insert({
+          participant_one: currentUser.id,
+          participant_two: listing.user_id,
+          created_by: currentUser.id,
+          context
+        }).select('*').single();
+        if (error) throw error;
+        conversation = data;
+        conversations.unshift(conversation);
       }
+      await openConversation(conversation, listing.user_id);
+      $('messages').scrollIntoView({behavior:'smooth'});
+    } catch (error) {
+      showStatus($('logisticsStatus'), 'تعذر فتح المحادثة: ' + (error?.message || 'تحقق من صلاحيات الدردشة'), 'error');
+    } finally {
+      if (button) { button.disabled = false; button.textContent = '💬 مراسلة'; }
+    }
+  }
 
-      const { error } = await adDb.from('ad_requests').insert({
-        user_id: user.id,
-        company_name: companyName,
-        ad_type: adType,
-        requested_style: requestedStyle,
-        brief,
-        contact_details: contactDetails,
+  async function openConversation(conversation, peerId) {
+    activeConversation = conversation;
+    $('chatPanel').hidden = false;
+    $('chatTitle').textContent = 'محادثة نقل';
+    $('chatSubtitle').textContent = conversation.context || 'محادثة خاصة';
+    await loadMessages();
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(() => {
+      if (activeConversation?.id === conversation.id) loadMessages(true);
+    }, 10000);
+  }
+
+  async function loadMessages(quiet = false) {
+    if (!activeConversation || !currentUser) return;
+    if (!quiet) $('chatMessages').innerHTML = '<p class="empty-state">جارٍ تحميل الرسائل…</p>';
+    const {data, error} = await db.from('chat_messages').select('*').eq('conversation_id', activeConversation.id).order('created_at', {ascending:true});
+    if (error) {
+      showStatus($('chatStatus'), 'تعذر تحميل الرسائل: ' + error.message, 'error');
+      if (!quiet) $('chatMessages').innerHTML = '<p class="empty-state">تعذر تحميل الرسائل.</p>';
+      return;
+    }
+    const container = $('chatMessages');
+    const previousCount = container.querySelectorAll('.message').length;
+    container.innerHTML = '';
+    if (!data?.length) {
+      container.innerHTML = '<p class="empty-state">ابدأ المحادثة برسالة قصيرة.</p>';
+      return;
+    }
+    data.forEach((message) => {
+      const item = document.createElement('div');
+      item.className = 'message' + (message.sender_id === currentUser.id ? ' mine' : '');
+      const time = message.created_at ? new Date(message.created_at).toLocaleTimeString('ar-DZ', {hour:'2-digit',minute:'2-digit'}) : '';
+      item.innerHTML = '<p>' + safe(message.body) + '</p><time>' + safe(time) + '</time>';
+      container.appendChild(item);
+    });
+    if (!quiet || data.length !== previousCount) container.scrollTop = container.scrollHeight;
+    showStatus($('chatStatus'), '');
+  }
+
+  $('refreshConversations').addEventListener('click', loadConversations);
+  $('refreshMessages').addEventListener('click', () => loadMessages());
+  $('backToConversations').addEventListener('click', () => {
+    activeConversation = null;
+    $('chatPanel').hidden = true;
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = null;
+  });
+
+  $('chatForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const body = $('chatInput').value.trim();
+    if (!body || !activeConversation || !currentUser) {
+      showStatus($('chatStatus'), 'افتح محادثة بعد تسجيل الدخول أولًا.', 'error');
+      return;
+    }
+    const button = $('chatForm').querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const {error} = await db.from('chat_messages').insert({
+        conversation_id: activeConversation.id,
+        sender_id: currentUser.id,
+        body
+      });
+      if (error) throw error;
+      $('chatInput').value = '';
+      await loadMessages();
+    } catch (error) {
+      showStatus($('chatStatus'), 'لم تُرسل الرسالة: ' + (error?.message || 'خطأ غير معروف'), 'error');
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  // Advertising requests remain available, but do not distract from the transport workflow.
+  $('adRequestForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = $('adRequestForm');
+    if (!form.reportValidity()) return;
+    if (!currentUser) {
+      showStatus($('adRequestStatus'), 'سجّل الدخول أولًا لإرسال طلب الإشهار.', 'error');
+      $('account').scrollIntoView({behavior:'smooth'});
+      return;
+    }
+    const values = Object.fromEntries(new FormData(form).entries());
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const {error} = await db.from('ad_requests').insert({
+        user_id: currentUser.id,
+        company_name: String(values.company || '').trim(),
+        ad_type: String(values.adType || '').trim(),
+        requested_style: String(values.style || '').trim(),
+        brief: String(values.brief || '').trim(),
+        contact_details: String(values.contact || '').trim(),
         status: 'pending'
       });
       if (error) throw error;
-
-      adStatus.textContent = 'تم إرسال طلب الإشهار وحفظه بنجاح. حالته الآن: قيد المراجعة.';
-      adStatus.classList.add('prepared');
-      adForm.reset();
+      showStatus($('adRequestStatus'), 'تم حفظ طلب الإشهار بنجاح، وهو الآن قيد المراجعة.', 'success');
+      form.reset();
     } catch (error) {
-      adStatus.textContent = 'تعذر حفظ طلب الإشهار: ' + (error?.message || 'خطأ غير معروف') + '. تحقق من تسجيل الدخول وسياسات RLS ثم أعد المحاولة.';
-      adStatus.classList.add('error');
+      showStatus($('adRequestStatus'), 'تعذر حفظ طلب الإشهار: ' + (error?.message || 'خطأ غير معروف'), 'error');
     } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = 'إرسال طلب الإشهار ↗';
-      }
+      button.disabled = false;
     }
   });
+
+  $('refreshListings').addEventListener('click', loadListings);
+  db.auth.getSession().then(({data, error}) => {
+    if (error) showStatus($('authStatus'), 'تعذر استعادة الجلسة: ' + error.message, 'error');
+    updateAuthUI(data?.session?.user || null);
+  });
+  db.auth.onAuthStateChange((_event, session) => updateAuthUI(session?.user || null));
+  loadListings();
+
+  // Register the installable-app service worker on HTTPS hosts such as GitHub Pages.
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
 })();
