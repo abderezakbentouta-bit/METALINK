@@ -264,7 +264,8 @@
       $('chatPanel').hidden = true;
       renderConversations();
     }
-    // Re-render announcement actions when the login state changes.
+    // Refresh personal dashboard and announcement actions when the login state changes.
+    renderDashboard();
     loadListings();
   }
 
@@ -386,6 +387,36 @@
     return card;
   }
 
+  function renderDashboard() {
+    const guest = $('dashboardGuest');
+    const content = $('dashboardContent');
+    if (!currentUser) { guest.hidden = false; content.hidden = true; return; }
+    guest.hidden = true; content.hidden = false;
+    const meta = currentUser.user_metadata || {};
+    const role = ({driver:'سائق',client:'زبون / صاحب حمولة',supplier:'مورد',individual:'شخص',company:'شركة'})[meta.account_type || 'driver'] || 'مستخدم';
+    $('dashboardName').textContent = meta.display_name || meta.driver_full_name || currentUser.email || 'مستخدم MetaLink';
+    $('dashboardRole').textContent = role;
+    $('dashboardLocation').textContent = [meta.wilaya, meta.commune].filter(Boolean).join(' · ') || meta.driver_residence || 'لم تُضف المنطقة بعد';
+    const mine = announcements.filter(row => row.user_id === currentUser.id);
+    const offers = mine.filter(row => row.type_annonce === 'offre_transport');
+    const requests = mine.filter(row => row.type_annonce === 'demande_transport');
+    $('dashboardTotal').textContent = String(mine.length);
+    $('dashboardOffers').textContent = String(offers.length);
+    $('dashboardRequests').textContent = String(requests.length);
+    $('dashboardPublish').textContent = (meta.account_type || 'driver') === 'driver' ? '➕ نشر شاحنتي' : '➕ طلب نقل';
+    const list = $('dashboardOwnListings'); list.innerHTML = '';
+    if (!mine.length) { list.innerHTML = '<p class="empty-state">لا توجد إعلانات منشورة بعد. ابدأ بنشر شاحنة أو طلب نقل.</p>'; return; }
+    mine.slice(0,3).forEach(row => {
+      const item = document.createElement('div'); item.className = 'dashboard-own-item';
+      const type = row.type_annonce === 'offre_transport' ? '🚛 عرض شاحنة' : '🔎 طلب نقل';
+      const route = [row.ville_depart, row.ville_arrivee].filter(Boolean).join(' ← ');
+      item.innerHTML = '<strong></strong><span></span>';
+      item.querySelector('strong').textContent = type;
+      item.querySelector('span').textContent = route || 'إعلان نقل';
+      list.appendChild(item);
+    });
+  }
+
   async function loadListings() {
     const container = $('logisticsListings');
     container.innerHTML = '<p class="empty-state">جارٍ تحميل الإعلانات…</p>';
@@ -397,6 +428,7 @@
       return;
     }
     announcements = data || [];
+    renderDashboard();
     container.innerHTML = '';
     if (!announcements.length) {
       container.innerHTML = '<p class="empty-state">لا توجد عروض بعد. كن أول من ينشر شاحنة أو طلب نقل.</p>';
