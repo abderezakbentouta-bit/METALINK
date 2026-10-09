@@ -110,6 +110,108 @@
   $('signInMode').addEventListener('click', () => setAuthMode('signin'));
   $('signUpMode').addEventListener('click', () => setAuthMode('signup'));
 
+  let savedDriverProfile = null;
+
+  function readDriverProfile(user = currentUser) {
+    const metadata = user?.user_metadata || {};
+    return {
+      fullName: String(metadata.driver_full_name || '').trim(),
+      plate: String(metadata.driver_plate || '').trim(),
+      residence: String(metadata.driver_residence || '').trim(),
+      phone: String(metadata.driver_phone || '').trim(),
+      photoUrl: String(metadata.driver_photo_url || '').trim()
+    };
+  }
+
+  function fillDriverProfile(user) {
+    const profile = readDriverProfile(user);
+    savedDriverProfile = profile;
+    $('driverFullName').value = profile.fullName;
+    $('driverPlate').value = profile.plate;
+    $('driverResidence').value = profile.residence;
+    $('driverPhone').value = profile.phone;
+    $('carrierPhone').value = profile.phone;
+    $('driverPhoto').required = !profile.photoUrl;
+    $('driverPhotoPreview').hidden = !profile.photoUrl;
+    $('driverPhotoPreview').src = profile.photoUrl || '';
+    $('driverProfileSection').hidden = !user;
+  }
+
+  $('driverPhoto').addEventListener('change', () => {
+    const file = $('driverPhoto').files?.[0];
+    if (!file) {
+      $('driverPhotoPreview').hidden = !savedDriverProfile?.photoUrl;
+      $('driverPhotoPreview').src = savedDriverProfile?.photoUrl || '';
+      return;
+    }
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+      $('driverPhoto').value = '';
+      showStatus($('driverProfileStatus'), 'اختر صورة JPG أو PNG أو WebP لا يتجاوز حجمها 2 ميغابايت.', 'error');
+      return;
+    }
+    $('driverPhotoPreview').src = URL.createObjectURL(file);
+    $('driverPhotoPreview').hidden = false;
+  });
+
+  $('driverProfileForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!currentUser) {
+      showStatus($('driverProfileStatus'), 'سجّل الدخول بالبريد الإلكتروني أولًا.', 'error');
+      return;
+    }
+    const form = $('driverProfileForm');
+    if (!form.reportValidity()) return;
+    const button = $('saveDriverProfile');
+    button.disabled = true;
+    button.textContent = 'جارٍ حفظ الملف…';
+    try {
+      const profile = {
+        fullName: $('driverFullName').value.trim(),
+        plate: $('driverPlate').value.trim(),
+        residence: $('driverResidence').value.trim(),
+        phone: $('driverPhone').value.trim(),
+        photoUrl: savedDriverProfile?.photoUrl || ''
+      };
+      const file = $('driverPhoto').files?.[0];
+      if (file) {
+        if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+          throw new Error('اختر صورة JPG أو PNG أو WebP لا يتجاوز حجمها 2 ميغابايت.');
+        }
+        const extension = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+        const path = currentUser.id + '/profile-' + Date.now() + '.' + extension;
+        const {error: uploadError} = await db.storage.from('driver-photos').upload(path, file, {upsert:true, contentType:file.type});
+        if (uploadError) {
+          if (/bucket|not found|does not exist/i.test(uploadError.message || '')) {
+            throw new Error('يلزم إنشاء مساحة الصور driver-photos في Supabase وتشغيل ملف supabase-driver-profile.sql الموجود في GitHub.');
+          }
+          throw uploadError;
+        }
+        const {data: publicData} = db.storage.from('driver-photos').getPublicUrl(path);
+        profile.photoUrl = publicData?.publicUrl || '';
+        if (!profile.photoUrl) throw new Error('تعذر إنشاء رابط صورة السائق.');
+      } else if (!profile.photoUrl) {
+        throw new Error('أضف صورة السائق لإكمال الملف.');
+      }
+      const {data, error} = await db.auth.updateUser({data:{
+        driver_full_name: profile.fullName,
+        driver_plate: profile.plate,
+        driver_residence: profile.residence,
+        driver_phone: profile.phone,
+        driver_photo_url: profile.photoUrl
+      }});
+      if (error) throw error;
+      currentUser = data.user || currentUser;
+      fillDriverProfile(currentUser);
+      showStatus($('driverProfileStatus'), 'تم حفظ ملف السائق. هذا لا يعني أن الهوية قد تم التحقق منها رسميًا.', 'success');
+      showStatus($('authStatus'), 'تم حفظ ملف السائق بنجاح.', 'success');
+    } catch (error) {
+      showStatus($('driverProfileStatus'), 'تعذر حفظ الملف: ' + (error?.message || 'خطأ غير معروف'), 'error');
+    } finally {
+      button.disabled = false;
+      button.textContent = '💾 حفظ ملف السائق';
+    }
+  });
+
   function updateAuthUI(user) {
     currentUser = user || null;
     $('accountLabel').textContent = currentUser ? (currentUser.email || 'متصل') : 'زائر';
@@ -122,9 +224,12 @@
     if (currentUser) {
       $('authEmail').value = currentUser.email || '';
       $('authPassword').value = '';
+      fillDriverProfile(currentUser);
       showStatus($('authStatus'), 'أنت متصل الآن. يمكنك نشر الحمولة وفتح الرسائل.', 'success');
       loadConversations();
     } else {
+      $('driverProfileSection').hidden = true;
+      savedDriverProfile = null;
       $('authEmail').readOnly = false;
       $('authPassword').hidden = false;
       $('authPassword').required = true;
@@ -212,7 +317,12 @@
     const info = String(row.informations || '');
     const dateMatch = info.match(/Date : ([^|]+)/);
     const priceMatch = info.match(/(?:Prix souhaité|Budget indicatif) : ([^|]+)/);
-    const extra = info.split('|').map((part) => part.trim()).filter((part) => !/^Date :|^Prix souhaité :|^Budget indicatif :/.test(part)).join(' · ');
+    let driverProfile = null;
+    const profileMatch = info.match(/PROFILE_JSON:(\{[^|]*\})/);
+    if (profileMatch) {
+      try { driverProfile = JSON.parse(profileMatch[1]); } catch (_) { driverProfile = null; }
+    }
+    const extra = info.split('|').map((part) => part.trim()).filter((part) => !/^Date :|^Prix souhaité :|^Budget indicatif :|^PROFILE_JSON:/.test(part)).join(' · ');
     const card = document.createElement('article');
     card.className = 'listing-card';
     const call = String(row.telephone || '').trim();
@@ -221,6 +331,9 @@
         <span class="listing-kind ${carrier ? '' : 'request'}">${carrier ? '🚛 شاحنة' : '📦 حمولة'}</span>
         <div class="listing-main"><h3>${safe(row.ville_depart || '؟')} ← ${safe(row.ville_arrivee || '؟')}</h3><p>${safe(subtitle)}</p></div>
       </div>
+      ${carrier && driverProfile ? '<div class="driver-listing-profile">' +
+        (driverProfile.photoUrl ? '<img src="' + safe(driverProfile.photoUrl) + '" alt="صورة السائق" loading="lazy">' : '<span class="driver-listing-avatar">👤</span>') +
+        '<div><strong>' + safe(driverProfile.fullName || 'سائق') + '</strong><span>🚛 ' + safe(driverProfile.plate || 'ترقيم غير مذكور') + '</span><span>📍 ' + safe(driverProfile.residence || 'مكان الإقامة غير مذكور') + '</span></div></div>' : ''}
       <div class="listing-facts">
         <span class="fact">📅 ${safe(dateText(dateMatch ? dateMatch[1].trim() : ''))}</span>
         <span class="fact">💰 ${safe(priceMatch ? priceMatch[1].trim() : 'السعر بالتفاوض')}</span>
@@ -268,6 +381,15 @@
       }
       const values = Object.fromEntries(new FormData(form).entries());
       const carrier = type === 'carrier';
+      if (carrier) {
+        const profile = readDriverProfile();
+        if (!profile.fullName || !profile.plate || !profile.residence || !profile.phone || !profile.photoUrl) {
+          showStatus($('driverProfileStatus'), 'أكمل اسم السائق وترقيم الشاحنة ومكان الإقامة والهاتف والصورة، ثم احفظ الملف.', 'error');
+          $('driverProfileSection').hidden = false;
+          $('driverProfileSection').scrollIntoView({behavior:'smooth', block:'start'});
+          return;
+        }
+      }
       const button = form.querySelector('button[type="submit"]');
       const originalText = button.textContent;
       button.disabled = true;
@@ -279,6 +401,7 @@
       ];
       const details = carrier ? values.cargo : values.details;
       if (details?.trim()) info.push(details.trim());
+      if (carrier) info.push('PROFILE_JSON:' + JSON.stringify(readDriverProfile()));
       const row = {
         user_id: currentUser.id,
         type_annonce: carrier ? 'offre_transport' : 'demande_transport',
@@ -287,7 +410,7 @@
         marchandise: carrier ? (values.cargo?.trim() || 'À préciser') : values.cargoType,
         quantite_tonnes: Number(carrier ? values.capacity : values.weight),
         type_camion: carrier ? values.vehicle : null,
-        telephone: values.phone.trim(),
+        telephone: carrier ? readDriverProfile().phone : values.phone.trim(),
         informations: info.join(' | ')
       };
       try {
